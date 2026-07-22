@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vizzbreeze" # Unique package identifier registered on the PyPI index
+version = "1.0.5"
+authors = [
+    { name = "Mila Alex", linkedin = "https://www.linkedin.com/in/mila-alex-cfa/" }
+]
+description = "A high-performance streamlined transactional web-dashboard and Jupyter-compatible framework for advanced graph analytics and risk audit."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Visualization"
+]
+
+# Core project dependencies. PyPI will automatically install these for the user upon pip execution!
+dependencies = [
+    "streamlit>=1.35.0",
+    "pandas>=2.1.0",
+    "numpy>=1.25.0",
+    "plotly>=5.18.0",
+    "openpyxl>=3.1.0"
+]
+
+# Core command script: Registers a global console shortcut for rapid terminal dashboard launching
+[project.scripts]
+vizzbreeze-run = "vizzbreeze.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vizzbreeze"]
