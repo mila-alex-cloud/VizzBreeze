@@ -2,7 +2,7 @@
 
 A lightweight, high-performance transactional web-dashboard designed for advanced data flow analytics, multi-stage routing visualization, and statistical risk audit. Built natively on top of Streamlit, Pandas, and Plotly.
 
-<video src="demo.mp4" controls width="100%"></video>
+<video src="demo.mp4" controls width="60%"></video>
 
 ## Key Features
 
