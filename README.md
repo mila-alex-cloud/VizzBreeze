@@ -2,7 +2,7 @@
 
 A lightweight, high-performance transactional web-dashboard designed for advanced data flow analytics, multi-stage routing visualization, and statistical risk audit. Built natively on top of Streamlit, Pandas, and Plotly.
 
-![VizzBreeze Demo](demo.mp4)
+<video src="demo.mp4" controls width="100%" poster="https://githubusercontent.com"></video>
 
 ## Key Features
 
