@@ -9,6 +9,11 @@ A lightweight, high-performance transactional web-dashboard designed for advance
 - **Auto-Scroll Suppression**: Enhanced layout architecture prevents viewport jumps during widget updates and data updates.
 - **Advanced Graph Matrix Analytics**: Includes high-fidelity stacked charts, multi-dimensional Parcats layouts, Density Matrices, and automated IQR risk audit profiling tools.
 
+## Build With
+1  - [Plotly](https://plotly.com) - Core interactive charting engine.
+2  - [Streamlit](https://streamlit.io) - Cloud infrastructure and web UI framework.
+3  - [Pandas](https://pydata.org) - High-performance data structures and data analysis engine.
+
 ## Quick Start
 
 You can install and launch the interactive analytical control room globally using just two commands in your terminal:
@@ -40,13 +45,22 @@ print(vb.COLOR_PALETTES.keys())
 chosen_colors = vb.COLOR_PALETTES["Warm Amber"]
 ```
 
+## Core Analytical Tabs
+
+1. **Flows**: Explore multi-stage multi-dimensional category paths with thin, light axis labels and custom high-contrast hover tooltips.
+2. **Funnel**: Track progressive conversion drops along specific workflow layers.
+3. **Structural Breakdown**: Classic stacked column bar charts configured with responsive axis titles that update on the fly based on active filters.
+4. **Bento**: An asymmetrical modular tile framework designed to compress complex multi-level dimensions into a clean, prioritized grid dashboard.
+5. **Density Matrix**: High-density dashboard to scan cluster intersections instantly.
+5. **Anomaly & Risk Audit**: Automated statistical anomaly profiling that detects process outliers without freezing the browser engine.
+
 ### Core Functions API Reference & Parameter Mapping
 
 All visualization engines are fully modular, accept un-aggregated raw `pandas.DataFrame` inputs, and return native `plotly.graph_objects.Figure` interactive objects.
 
 ---
 
-### 1. Multi-Stage Category Flows
+### 1. Flows
 ```python
 fig = vb.generate_parcats(
     df=df,                          # pandas.DataFrame: Source transaction logs (un-aggregated)
@@ -62,11 +76,15 @@ fig = vb.generate_parcats(
     height_px=500,                  # int: Holster canvas height
     title_x=0.5                     # float: Header Alighnment
 )
+fig.update_layout(
+    margin=dict(l=100, r=100, t=100, b=50)
+    )
+fig.show()
 ```
 
 <img width="837" height="416" alt="image" src="https://github.com/user-attachments/assets/fa4bc19d-4629-4d7e-a733-afc4dfd30ac8" />
 
-### 2. Conversion Pipeline
+### 2. Funnel
 ```python
 fig = vb.generate_funnel_chart(
     df=df,
@@ -82,11 +100,15 @@ fig = vb.generate_funnel_chart(
     height_px=500,
     title_x=0.5                     
 )
+fig.update_layout(
+    margin=dict(l=250, r=20, t=100, b=50)
+    )
+fig.show()
 ```
 
 <img width="934" height="437" alt="image" src="https://github.com/user-attachments/assets/517a4d97-6eeb-44cd-8d95-b583cc22bdd6" />
 
-### 3. Composition Stacked Bars
+### 3. Structural Breakdown
 ```python
 fig = vb.generate_stacked_bar_chart(
     df=df,
@@ -101,11 +123,19 @@ fig = vb.generate_stacked_bar_chart(
     height_px=500,
     title_x=0.5 
 )
+fig.update_layout(
+    margin=dict(l=100, r=20, t=50, b=50) 
+)
+fig.update_layout(
+    yaxis=dict(
+        title="", 
+    )
+fig.show()
 ```
 
 <img width="923" height="427" alt="image" src="https://github.com/user-attachments/assets/a9ea4ef1-ba04-453f-b105-2693a228f240" />
 
-### 4. Bento Treemap Tiles
+### 4. Bento
 ```python
 fig = vb.generate_bento_treemap(
     df=df,
@@ -119,11 +149,15 @@ fig = vb.generate_bento_treemap(
     height_px=500,
     title_x=0.5 
 )
+fig.update_layout(
+    margin=dict(l=50, r=20, t=50, b=50)
+    )
+fig.show()
 ```
 
 <img width="909" height="405" alt="image" src="https://github.com/user-attachments/assets/1fc64f9e-ef9b-473d-914a-6d295254cf4e" />
 
-### 5. Intersection Density Matrix
+### 5. Density Matrix
 ```python
 fig = vb.generate_heatmap(
     df=df,
@@ -139,11 +173,15 @@ fig = vb.generate_heatmap(
     height_px=500,
     title_x=0.5 
 )
+fig.update_layout(
+    margin=dict(l=100, r=20, t=50, b=50)
+    )
+fig.show()
 ```
 
 <img width="939" height="436" alt="image" src="https://github.com/user-attachments/assets/395a247b-788b-4d81-a9dd-5d9b93546b1c" />
 
-### 6. Statistical Risk Audit Profiler
+### 6. Anomaly & Risk Audit
 ```python
 fig = vb.generate_outliers_chart(
     df=df,
@@ -158,19 +196,19 @@ fig = vb.generate_outliers_chart(
     height_px=500,
     title_x=0.5 
 )
+fig.update_layout(
+    margin=dict(l=170, r=20, t=50, b=70)
+    )
+fig.update_layout(
+    yaxis=dict(
+        title="", 
+    )
+)
+fig.show()
 ```
 
 <img width="934" height="442" alt="image" src="https://github.com/user-attachments/assets/50398b02-b697-44d8-a55a-5c0c2215f0b3" />
 
-
-## Core Analytical Tabs
-
-1. **Flows**: Explore multi-stage multi-dimensional category paths with thin, light axis labels and custom high-contrast hover tooltips.
-2. **Funnel**: Track progressive conversion drops along specific workflow layers.
-3. **Structural Breakdown**: Classic stacked column bar charts configured with responsive axis titles that update on the fly based on active filters.
-4. **Bento**: An asymmetrical modular tile framework designed to compress complex multi-level dimensions into a clean, prioritized grid dashboard.
-5. **Density Matrix**: High-density dashboard to scan cluster intersections instantly.
-5. **Anomaly & Risk Audit**: Automated statistical anomaly profiling that detects process outliers without freezing the browser engine.
 
 ## Requirements
 
