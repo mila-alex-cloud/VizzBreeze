@@ -2,8 +2,6 @@
 
 A lightweight, high-performance transactional web-dashboard designed for advanced data flow analytics, multi-stage routing visualization, and statistical risk audit. Built natively on top of Streamlit, Pandas, and Plotly.
 
-<video src="demo.mp4" controls width="60%"></video>
-
 ## Key Features
 
 - **Flat Transaction Processing Engine**: Optimized for fast processing of un-aggregated logs (e.g., Client ➔ Fund ➔ Asset).
@@ -66,6 +64,8 @@ fig = vb.generate_parcats(
 )
 ```
 
+<img width="837" height="416" alt="image" src="https://github.com/user-attachments/assets/fa4bc19d-4629-4d7e-a733-afc4dfd30ac8" />
+
 ### 2. Conversion Pipeline
 ```python
 fig = vb.generate_funnel_chart(
@@ -84,6 +84,8 @@ fig = vb.generate_funnel_chart(
 )
 ```
 
+<img width="934" height="437" alt="image" src="https://github.com/user-attachments/assets/517a4d97-6eeb-44cd-8d95-b583cc22bdd6" />
+
 ### 3. Composition Stacked Bars
 ```python
 fig = vb.generate_stacked_bar_chart(
@@ -101,6 +103,8 @@ fig = vb.generate_stacked_bar_chart(
 )
 ```
 
+<img width="923" height="427" alt="image" src="https://github.com/user-attachments/assets/a9ea4ef1-ba04-453f-b105-2693a228f240" />
+
 ### 4. Bento Treemap Tiles
 ```python
 fig = vb.generate_bento_treemap(
@@ -116,6 +120,8 @@ fig = vb.generate_bento_treemap(
     title_x=0.5 
 )
 ```
+
+<img width="909" height="405" alt="image" src="https://github.com/user-attachments/assets/1fc64f9e-ef9b-473d-914a-6d295254cf4e" />
 
 ### 5. Intersection Density Matrix
 ```python
@@ -135,6 +141,8 @@ fig = vb.generate_heatmap(
 )
 ```
 
+<img width="939" height="436" alt="image" src="https://github.com/user-attachments/assets/395a247b-788b-4d81-a9dd-5d9b93546b1c" />
+
 ### 6. Statistical Risk Audit Profiler
 ```python
 fig = vb.generate_outliers_chart(
@@ -151,6 +159,8 @@ fig = vb.generate_outliers_chart(
     title_x=0.5 
 )
 ```
+
+<img width="934" height="442" alt="image" src="https://github.com/user-attachments/assets/50398b02-b697-44d8-a55a-5c0c2215f0b3" />
 
 
 ## Core Analytical Tabs
