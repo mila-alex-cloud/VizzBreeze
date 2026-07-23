@@ -61,7 +61,8 @@ fig = vb.generate_parcats(
     chart_title="Flow Canvas",      # str: Custom graph header text
     title_size=20,                  # int: Font size of the chart title
     width_px=1050,                  # int: Holster canvas width (1050 fits Jupyter viewports perfectly)
-    height_px=500                   # int: Holster canvas height
+    height_px=500,                  # int: Holster canvas height
+    title_x=0.5                     # float: Header Alighnment
 )
 ```
 
@@ -78,7 +79,8 @@ fig = vb.generate_funnel_chart(
     force_shuffle=False,
     chart_title="Pipeline Drops",
     width_px=1050,
-    height_px=500
+    height_px=500,
+    title_x=0.5                     
 )
 ```
 
@@ -94,7 +96,8 @@ fig = vb.generate_stacked_bar_chart(
     force_shuffle=False,
     chart_title="Composition",
     width_px=1050,
-    height_px=500
+    height_px=500,
+    title_x=0.5 
 )
 ```
 
@@ -109,7 +112,8 @@ fig = vb.generate_bento_treemap(
     force_shuffle=False,
     chart_title="Bento Allocation Top-15", # Automatically truncates grid layout to Top 15 nodes
     width_px=1050,
-    height_px=500
+    height_px=500,
+    title_x=0.5 
 )
 ```
 
@@ -126,7 +130,8 @@ fig = vb.generate_heatmap(
     chart_title="Density Matrix",
     show_annot=True,                # bool: Inject clean, non-zero numeric labels inside active cells
     width_px=1050,
-    height_px=500
+    height_px=500,
+    title_x=0.5 
 )
 ```
 
@@ -142,7 +147,8 @@ fig = vb.generate_outliers_chart(
     force_shuffle=False,
     chart_title="Statistical Anomaly Profile", # Automatically plots a dashed line at Q3 + 1.5*IQR upper boundary
     width_px=1050,
-    height_px=500
+    height_px=500,
+    title_x=0.5 
 )
 ```
 
@@ -162,6 +168,13 @@ fig = vb.generate_outliers_chart(
 - Streamlit >= 1.35.0
 - Pandas >= 2.1.0
 - Plotly >= 5.18.0
+
+## Roadmap
+
+- Advanced Data Preprocessing Pipeline: Implementing automated anomaly tracking and missing value imputation optimized for multi-source financial and operational data arrays.
+- Interactive Risk Metrics: Adding features for deep data analysis, including volatility tracking, anomaly detection, and custom structural breakdown widgets.
+- Large-Scale Data Engineering: Adding chunks-based data loading and optimization widgets to seamlessly process unaggregated corporate and industrial datasets exceeding 500MB.
+- Enterprise Stability & Testing: Expanding code verification with an extensive pytest suite to achieve 85%+ test coverage for secure local CLI execution.
 
 ## License
 
