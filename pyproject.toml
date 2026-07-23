@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "vizzbreeze" # Unique package identifier registered on the PyPI index
-version = "1.0.5"
+version = "1.0.6"
 authors = [
     { name = "Mila Alex"}
 ]
