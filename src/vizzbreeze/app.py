@@ -13,7 +13,7 @@ st.set_page_config(
 # --- BRANDING IN SIDEBAR ---
 st.sidebar.title("VizzBreeze")
 st.sidebar.markdown("*From Chaos to Clarity*")
-st.sidebar.markdown("Developed by: [Mila Alex, CFA](https://linkedin.com)")
+st.sidebar.markdown("Developed by: [Mila Alex, CFA](https://www.linkedin.com/in/mila-alex-cfa/)")
 st.sidebar.markdown("---")
 
 
