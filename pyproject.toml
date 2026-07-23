@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "vizzbreeze" # Unique package identifier registered on the PyPI index
 version = "1.0.5"
 authors = [
-    { name = "Mila Alex", linkedin = "https://www.linkedin.com/in/mila-alex-cfa/" }
+    { name = "Mila Alex"}
 ]
 description = "A high-performance streamlined transactional web-dashboard and Jupyter-compatible framework for advanced graph analytics and risk audit."
 readme = "README.md"
@@ -33,3 +33,7 @@ vizzbreeze-run = "vizzbreeze.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/vizzbreeze"]
+
+[project.urls]
+"Homepage" = "https://github.com/mila-alex-cloud/VizzBreeze"
+"linkedin" = "https://www.linkedin.com/in/mila-alex-cfa" 
