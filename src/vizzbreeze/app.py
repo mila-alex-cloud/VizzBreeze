@@ -20,8 +20,11 @@ st.sidebar.markdown("---")
 # Inject custom stylesheets to enforce consistent font styling and smooth layout transitions
 import streamlit as st
 
-# 1. Inject ONLY clean CSS. Without scripts, it is fully safe for cloud environments like Google Colab.
-st.markdown(r"""
+from streamlit.runtime.scriptrunner import get_script_run_ctx
+
+# Проверяем, запущен ли код внутри Streamlit-приложения
+if get_script_run_ctx() is not None:
+    st.markdown(r"""
     <style>
         /* Scale up font styling inside tab headers */
         button[data-baseweb="tab"] {
@@ -44,7 +47,6 @@ st.markdown(r"""
         }
     </style>
 """, unsafe_allow_html=True)
-
 
 # =============================================================================
 # GLOBAL SESSION STATE MATRIX & TYPOGRAPHY ANCHORS (PEP 8 COMPLIANT)
@@ -921,7 +923,9 @@ def generate_outliers_chart(df, stage_col, target_col, value_col, selected_palet
 # INGESTION & PIPELINE RUNTIME LOGIC (DASHBOARD CONTROL WORKSPACE)
 # =============================================================================
 
-uploaded_file = st.file_uploader("", type=["xlsx"])
+uploaded_file = st.file_uploader("Upload Excel File",
+                                 type=["xlsx"],
+                                 label_visibility="collapsed")
 
 if uploaded_file is not None:
     opt_table = pd.read_excel(uploaded_file)
