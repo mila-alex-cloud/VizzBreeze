@@ -18,69 +18,33 @@ st.sidebar.markdown("---")
 
 
 # Inject custom stylesheets to enforce consistent font styling and smooth layout transitions
+import streamlit as st
+
+# 1. Inject ONLY clean CSS. Without scripts, it is fully safe for cloud environments like Google Colab.
 st.markdown(r"""
     <style>
-        /* 1. Target the tab button container directly to force all text elements to scale up */
+        /* Scale up font styling inside tab headers */
         button[data-baseweb="tab"] {
             font-size: 22px !important;
             font-weight: bold !important;
         }
-        
-        /* 2. Override default styling rules for nested span, div, and p elements inside this button */
         button[data-baseweb="tab"] * {
             font-size: 22px !important;
             font-weight: bold !important;
             font-family: 'Arial', sans-serif !important;
         }
-        
-        /* 3. Final hook layout injection for markdown text containers within the tab list vector */
         [data-baseweb="tab-list"] button div {
             font-size: 22px !important;
             font-weight: bold !important;
         }
         
-        /* 4. Completely strip out dirty Plotly text shadows, outlines, and default filters */
-        .parcats text, .parcats .tick text, g.axis text, text.mval {
-            text-shadow: none !important;
-            stroke: none !important;
-            filter: none !important;
-            font-weight: normal !important;
-            fill: #1f1f1f !important;
-        }
-        
-        /* 5. Set the minimum height of the tab panel to prevent page jumps during chart re-rendering */
+        /* Set minimum tab panel height to suppress viewport page jumps during chart re-rendering */
         .stTabs [data-baseweb="tab-panel"] {
             min-height: 800px !important;
         }
     </style>
-    
-    <!-- JavaScript DOM Observer: Placed at top-level to bypass iframe security blocks -->
-    <script>
-        (() => {
-            const runSvgSubstitution = () => {
-                # Scan the entire active window document for Plotly hover labels
-                const elements = document.querySelectorAll('.hoverlayer text, text');
-                elements.forEach(el => {
-                    # Case-insensitive intercept for 'Count:', 'Count =', 'count:', or 'count ='
-                    if (/count\s*[:=]/i.test(el.textContent)) {
-                        el.textContent = el.textContent.replace(/count\s*[:=]/i, 'Sum:');
-                    }
-                });
-            };
-            
-            # Register a lightweight observer to track real-time cursor hover micro-mutations
-            const observer = new MutationObserver(() => {
-                runSvgSubstitution();
-            });
-            
-            # Start tracking the root document body for dynamic async modifications
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-        })();
-    </script>
 """, unsafe_allow_html=True)
+
 
 # =============================================================================
 # GLOBAL SESSION STATE MATRIX & TYPOGRAPHY ANCHORS (PEP 8 COMPLIANT)
@@ -407,12 +371,11 @@ def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette, 
 
         # Lock high-contrast text strings inside tooltips safely on the layout canvas layer
         hoverlabel=dict(
-            bgcolor="white",
             font_size=12,
-            font_family="Arial",
             font_color="#000000"
         )
     )
+
     return fig
 
 
