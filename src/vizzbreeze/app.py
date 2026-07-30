@@ -56,7 +56,7 @@ if "global_measure_col" not in st.session_state:
     st.session_state["global_measure_col"] = "Number of rows (Sample size)"
 
 if "global_chart_title" not in st.session_state:
-    st.session_state["global_chart_title"] = "Structural Composition Breakdown"
+    st.session_state["global_chart_title"] = "Add Header"
 
 if "global_title_size" not in st.session_state:
     st.session_state["global_title_size"] = 20
@@ -589,7 +589,7 @@ def generate_stacked_bar_chart(df, stage_nodes, target_node, value_col, selected
         xaxis=dict(title=dict(
                 text=' ➔ '.join([str(c).upper() for c in x_cols]),
                 font=dict(size=12, family="Arial", color="#1f1f1f")
-            ), showgrid=False, linecolor='#000000', tickangle=0),
+            ), showgrid=False, linecolor='#000000', tickangle=270),
         yaxis=dict(title=dict(
                 text=value_col,
                 font=dict(size=12, family="Arial", color="#1f1f1f")
@@ -1083,7 +1083,7 @@ if uploaded_file is not None:
         p_ctrl1, p_ctrl2, p_ctrl3 = st.columns(3)
         with p_ctrl1:
             selected_stages_parcats = st.multiselect(
-                "Define Starting/Intermediate Stages:",
+                "Source/Intermediate Points:",
                 options=all_columns,
                 default=[all_columns[0]] if len(all_columns) > 0 else all_columns,
                 key="p_stages_multi"
@@ -1093,7 +1093,7 @@ if uploaded_file is not None:
             if not remaining_for_target:
                 remaining_for_target = all_columns
             final_target_parcats = st.selectbox(
-                "Select Final Destination Column:",
+                "Target:",
                 options=remaining_for_target,
                 index=0,
                 key="p_target_final"
@@ -1104,7 +1104,7 @@ if uploaded_file is not None:
             default_idx_par = parcats_metric_options.index(current_global_val) if current_global_val in parcats_metric_options else 0
 
             value_col_parcats = st.selectbox(
-                "Select Weight/Volume Column:",
+                "Weight/Volume:",
                 options=parcats_metric_options,
                 index=default_idx_par,
                 key="local_val_parcats",
@@ -1203,7 +1203,7 @@ if uploaded_file is not None:
         fun_ctrl_col1, fun_ctrl_col2, fun_ctrl_col3 = st.columns(3)
         with fun_ctrl_col1:
             selected_stages_fun = st.multiselect(
-                "Define Starting/Intermediate Stages:",
+                "Source/Intermediate Points:",
                 options=all_columns,
                 default=[all_columns[0]] if len(all_columns) > 0 else all_columns,
                 key="fun_stages_multi"
@@ -1213,7 +1213,7 @@ if uploaded_file is not None:
             if not remaining_for_fun_target:
                 remaining_for_fun_target = all_columns
             final_target_fun = st.selectbox(
-                "Select Final Destination Column:",
+                "Target:",
                 options=remaining_for_fun_target,
                 index=0,
                 key="fun_target_final"
@@ -1223,7 +1223,7 @@ if uploaded_file is not None:
             current_global_val = st.session_state["global_measure_col"]
             default_idx_fun = funnel_metric_options.index(current_global_val) if current_global_val in funnel_metric_options else 0
             value_col_fun = st.selectbox(
-                "Select Weight/Volume Column:",
+                "Weight/Volume:",
                 options=funnel_metric_options,
                 index=default_idx_fun,
                 key="local_val_funnel",
@@ -1366,7 +1366,7 @@ if uploaded_file is not None:
         bar_ctrl_col1, bar_ctrl_col2, bar_ctrl_col3 = st.columns(3)
         with bar_ctrl_col1:
             selected_stages_bar = st.multiselect(
-                "Define Starting/Intermediate Stages:",
+                "Source/Intermediate Points:",
                 options=all_columns,
                 default=[all_columns[0]] if len(all_columns) > 0 else all_columns,
                 key="bar_stages_multi"
@@ -1387,7 +1387,7 @@ if uploaded_file is not None:
             default_idx_bar = funnel_metric_options.index(current_global_val) if current_global_val in bar_metric_options else 0
 
             value_col_bar = st.selectbox(
-                "Select Weight/Volume Column:",
+                "Weight/Volume:",
                 options=bar_metric_options,
                 index=default_idx_bar,
                 key="local_val_bar",
@@ -1406,7 +1406,7 @@ if uploaded_file is not None:
         base_seed = st.session_state.get("current_seed", 42)
         use_shuffle_bar = base_seed + (palette_indices.get(selected_palette, 0) * 100) + 200
 
-        if check_is_aggregated_data(opt_table, selected_stages_fun, final_target_fun):
+        if check_is_aggregated_data(opt_table, selected_stages_bar, final_target_bar):
             pass
         else:
 
@@ -1491,7 +1491,7 @@ if uploaded_file is not None:
             current_global_val = st.session_state["global_measure_col"]
             default_idx_bento = bento_metric_options.index(current_global_val) if current_global_val in bento_metric_options else 0
             value_col_bento = st.selectbox(
-                "Select Weight/Volume Column:",
+                "Weight/Volume",
                 options=bento_metric_options,
                 index=default_idx_bento,
                 key="local_val_bento",
@@ -1502,7 +1502,7 @@ if uploaded_file is not None:
         with bento_ctrl_col1:
             id_options = [c for c in all_columns if c != value_col_bento]
             bento_id_col = st.selectbox(
-                "Select Categorical/ID Column:",
+                "Categorical Feature:",
                 options=id_options,
                 key="bento_id_raw"
             )
@@ -1517,35 +1517,32 @@ if uploaded_file is not None:
         base_seed = st.session_state.get("current_seed", 42)
         use_shuffle_bento = base_seed + (palette_indices.get(selected_palette, 0) * 100) + 300
 
-        if check_is_aggregated_data(opt_table, selected_stages_fun, final_target_fun):
-            pass
+
+        # Initialize the automated volumetric tile allocation engine
+        fig_bento = generate_bento_treemap(
+            df=opt_table,
+            id_col=bento_id_col,
+            value_col=value_col_bento,
+            selected_palette=chosen_colors,
+            unit_divider=unit_divider,
+            force_shuffle=use_shuffle_bento,
+            chart_title=bento_chart_title,
+            title_size=bento_title_size,
+            title_x=title_x_pos,
+            width_px=chart_width_px,
+            height_px=chart_height_px
+        )
+
+        # Execution Layer: Handle view rendering boundaries and edge exceptions
+        if not fig_bento.data:
+            st.info("No active data found for the current column selections.")
         else:
-
-            # Initialize the automated volumetric tile allocation engine
-            fig_bento = generate_bento_treemap(
-                df=opt_table,
-                id_col=bento_id_col,
-                value_col=value_col_bento,
-                selected_palette=chosen_colors,
-                unit_divider=unit_divider,
-                force_shuffle=use_shuffle_bento,
-                chart_title=bento_chart_title,
-                title_size=bento_title_size,
-                title_x=title_x_pos,
-                width_px=chart_width_px,
-                height_px=chart_height_px
-            )
-
-            # Execution Layer: Handle view rendering boundaries and edge exceptions
-            if not fig_bento.data:
-                st.info("No active data found for the current column selections.")
-            else:
-                st.plotly_chart(
-                    fig_bento,
-                    # FIXED: Activated container stretching to preserve bento tile text scaling
-                    use_container_width=True,
-                    config={'responsive': True, 'displaylogo': False}
-                )
+            st.plotly_chart(
+                fig_bento,
+                # Activated container stretching to preserve bento tile text scaling
+                use_container_width=True,
+                config={'responsive': True, 'displaylogo': False}
+        )
 
     # =============================================================================
     # TAB 5: DENSITY MATRIX (HEATMAP DENSITY ARCHITECTURE)
@@ -1649,41 +1646,37 @@ if uploaded_file is not None:
         base_seed = st.session_state.get("current_seed", 42)
         use_shuffle_heat = base_seed + (palette_indices.get(selected_palette, 0) * 100) + 400
 
-        if check_is_aggregated_data(opt_table, selected_stages_fun, final_target_fun):
-            pass
+        # Initialize the automated density matrix aggregation engine
+        fig_heatmap = generate_heatmap(
+            df=opt_table,
+            x_col=x_axis_heatmap,
+            y_col=y_axis_heatmap,
+            value_col=value_col_heatmap,
+            selected_palette=chosen_colors,
+            unit_divider=unit_divider,
+            force_shuffle=use_shuffle_heat,
+            chart_title=heatmap_chart_title,
+            title_size=heatmap_title_size,
+            title_x=title_x_pos_h,
+            width_px=chart_width_px,
+            height_px=chart_height_px,
+            show_annot=show_annotations
+        )
+
+        # Execution Layer: Handle view rendering boundaries and edge exceptions
+        if not fig_heatmap.data:
+            st.info("No active data found for the current grid selections.")
         else:
 
-            # Initialize the automated density matrix aggregation engine
-            fig_heatmap = generate_heatmap(
-                df=opt_table,
-                x_col=x_axis_heatmap,
-                y_col=y_axis_heatmap,
-                value_col=value_col_heatmap,
-                selected_palette=chosen_colors,
-                unit_divider=unit_divider,
-                force_shuffle=use_shuffle_heat,
-                chart_title=heatmap_chart_title,
-                title_size=heatmap_title_size,
-                title_x=title_x_pos_h,
-                width_px=chart_width_px,
-                height_px=chart_height_px,
-                show_annot=show_annotations
-            )
+            left_pad, center_grid, right_pad = st.columns([1.5, 7, 1.5])
 
-            # Execution Layer: Handle view rendering boundaries and edge exceptions
-            if not fig_heatmap.data:
-                st.info("No active data found for the current grid selections.")
-            else:
-
-                left_pad, center_grid, right_pad = st.columns([1.5, 7, 1.5])
-
-                with center_grid:
-                    st.plotly_chart(
-                        fig_heatmap,
-                        # FIXED: Enforce container scaling limits to preserve strict square cells layout ratio
-                        use_container_width=False,
-                        config={'responsive': True, 'displaylogo': False}
-                    )
+            with center_grid:
+                st.plotly_chart(
+                    fig_heatmap,
+                    # FIXED: Enforce container scaling limits to preserve strict square cells layout ratio
+                    use_container_width=False,
+                    config={'responsive': True, 'displaylogo': False}
+                )
 
     # =============================================================================
     # TAB 6: ANOMALY & RISK AUDIT (ROUTE TRANSACTIONS OUTLIER ANALYSIS)
@@ -1736,7 +1729,7 @@ if uploaded_file is not None:
         out_ctrl_col1, out_ctrl_col2, out_ctrl_col3 = st.columns(3)
         with out_ctrl_col1:
             stage_col_out = st.selectbox(
-                "Select Audit Stage Column (From):",
+                "Source (From):",
                 options=all_columns,
                 key="out_stage_axis"
             )
@@ -1748,7 +1741,7 @@ if uploaded_file is not None:
                 remaining_for_out_target = all_columns
 
             target_col_out = st.selectbox(
-                "Select Audit Target Column (To):",
+                "Target (To):",
                 options=remaining_for_out_target,
                 key="out_target_axis"
             )
@@ -1759,7 +1752,7 @@ if uploaded_file is not None:
             default_idx_out = numeric_cols.index(current_global_val) if current_global_val in numeric_cols else 0
 
             value_col_out = st.selectbox(
-                "Select Audit Weight/Volume Column:",
+                "Weight/Volume:",
                 options=numeric_cols,
                 index=default_idx_out,          # Preserves the user choice globally across tabs
                 key="local_val_outliers",       # Unique state tracking key for this selector element
@@ -1779,31 +1772,29 @@ if uploaded_file is not None:
         # Seed offset unified standard for the 7th tab view (+ 700)
         use_shuffle_out = base_seed + (palette_indices.get(selected_palette, 0) * 100) + 700
 
-        if check_is_aggregated_data(opt_table, selected_stages_fun, final_target_fun):
-            pass
+
+        # Initialize the automated statistical risk profiling engine targeting a specific route
+        fig_outliers = generate_outliers_chart(
+            df=opt_table,
+            stage_col=stage_col_out,
+            target_col=target_col_out,
+            value_col=value_col_out,
+            selected_palette=chosen_colors,
+            unit_divider=unit_divider,
+            force_shuffle=use_shuffle_out,
+            chart_title=outliers_chart_title,
+            title_size=outliers_title_size,
+            title_x=title_x_pos_out,
+            width_px=chart_width_px,
+            height_px=chart_height_px
+        )
+        # Execution Layer: Handle view rendering boundaries and edge exceptions
+        if fig_outliers is None or not fig_outliers.data:
+            st.info("No active pipeline connection found between the selected audit start and destination points.")
         else:
-            # Initialize the automated statistical risk profiling engine targeting a specific route
-            fig_outliers = generate_outliers_chart(
-                df=opt_table,
-                stage_col=stage_col_out,
-                target_col=target_col_out,
-                value_col=value_col_out,
-                selected_palette=chosen_colors,
-                unit_divider=unit_divider,
-                force_shuffle=use_shuffle_out,
-                chart_title=outliers_chart_title,
-                title_size=outliers_title_size,
-                title_x=title_x_pos_out,
-                width_px=chart_width_px,
-                height_px=chart_height_px
-            )
-            # Execution Layer: Handle view rendering boundaries and edge exceptions
-            if fig_outliers is None or not fig_outliers.data:
-                st.info("No active pipeline connection found between the selected audit start and destination points.")
-            else:
-                st.plotly_chart(
-                    fig_outliers,
-                    # FIXED: Activated responsive layout stretching to safeguard long compound path strings
-                    use_container_width=True,
-                    config={'responsive': True, 'displaylogo': False}
-                )
+            st.plotly_chart(
+                fig_outliers,
+                # FIXED: Activated responsive layout stretching to safeguard long compound path strings
+                use_container_width=True,
+                config={'responsive': True, 'displaylogo': False}
+        )

@@ -16,11 +16,28 @@ A lightweight, high-performance transactional web-dashboard designed for advance
 
 ## Quick Start
 
-You can install and launch the interactive analytical control room globally using just two commands in your terminal:
-
+#### Local Execution (Recommended)
+Just open your terminal and run the control room directly:
 ```bash
-pip install vizzbreeze
 vizzbreeze-run
+```
+
+#### Cloud Execution (Google Colab / Kaggle)
+If you are running inside a cloud notebook, use a tunnel proxy to access the web port:
+```bash
+!npx localtunnel --port 8501 & vizzbreeze-run
+```
+
+### Cloud Notebook Tip (Google Colab)
+If you experience connection drops or errors with `localtunnel` while uploading files in cloud environments, we highly recommend switching to **ngrok** for a rock-solid connection:
+
+```python
+!pip install pyngrok
+!ngrok config add-authtoken <YOUR_NGROK_TOKEN>
+
+from pyngrok import ngrok
+print("Stable Link:", ngrok.connect(8501, "http"))
+!vizzbreeze-run
 ```
 
 **Test Dataset**: To explore the dashboard features instantly, you can use the pre-configured spreadsheet **`sample_data_unaggregated.xlsx`** located in the root folder of this repository. Just drag and drop it into the sidebar upload zone!
