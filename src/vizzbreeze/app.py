@@ -55,6 +55,9 @@ if get_script_run_ctx() is not None:
 if "global_measure_col" not in st.session_state:
     st.session_state["global_measure_col"] = "Number of rows (Sample size)"
 
+if "global_color_col" not in st.session_state:
+    st.session_state["global_color_col"] = "Select Feature"
+
 if "global_chart_title" not in st.session_state:
     st.session_state["global_chart_title"] = "Add Header"
 
@@ -512,7 +515,16 @@ def generate_stacked_bar_chart(df, stage_nodes, target_node, value_col, selected
     x_cols = list(stage_nodes)
 
     # Create the horizontal multistep process label on the X-axis (e.g., Client_1 ➔ Fund_A)
-    df_clean['COMPOSITE_X'] = df_clean[x_cols].agg(' ➔ '.join, axis=1)
+    # df_clean['COMPOSITE_X'] = df_clean[x_cols].agg(' ➔ '.join, axis=1)
+
+    # 1. Check if the column list is not empty
+    if not x_cols:
+        # If no columns are selected, create a placeholder to prevent the chart from crashing
+        df_clean['COMPOSITE_X'] = "No stages selected"
+    else:
+        # 2. Safely cast all elements in the selected columns to strings
+        # and then join them using the arrow separator
+        df_clean['COMPOSITE_X'] = df_clean[x_cols].astype(str).agg(' ➔ '.join, axis=1)
 
     # Directly aggregate flat transaction items using a high-performance single groupby pass
     df_final = df_clean.groupby(['COMPOSITE_X', target_node])[value_col_internal].sum().reset_index()
@@ -1372,15 +1384,29 @@ if uploaded_file is not None:
                 key="bar_stages_multi"
             )
         with bar_ctrl_col2:
+            current_global_col = st.session_state.get("global_color_col")
+            # 2. Generate the list of available columns
             remaining_for_bar_target = [c for c in all_columns if c not in selected_stages_bar]
             if not remaining_for_bar_target:
                 remaining_for_bar_target = all_columns
+
+            # 3. Calculate the current index for the selectbox
+            # If the saved value exists in the new list, use its index; otherwise, default to 0
+            if current_global_col in remaining_for_bar_target:
+                default_index = remaining_for_bar_target.index(current_global_col)
+            else:
+                default_index = 0
+
+            # 4. Render the widget with the dynamic index
             final_target_bar = st.selectbox(
                 "Color by:",
                 options=remaining_for_bar_target,
-                index=0,
-                key="bar_target_final"
+                index=default_index,
+                key="local_color_col",
+                on_change=sync_global_session_variable,
+                args=("local_color_col", "global_color_col")
             )
+
         with bar_ctrl_col3:
             bar_metric_options = ["Number of rows (Sample size)"] + list(opt_table.select_dtypes(include=[np.number]).columns)
             current_global_val = st.session_state["global_measure_col"]
@@ -1392,7 +1418,7 @@ if uploaded_file is not None:
                 index=default_idx_bar,
                 key="local_val_bar",
                 on_change=sync_global_session_variable,
-                args=("local_title_size_bar", "global_title_size")
+                args=("local_val_bar", "global_measure_col")
             )
 
         st.markdown("---")
