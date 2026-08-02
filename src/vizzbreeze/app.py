@@ -18,46 +18,46 @@ st.sidebar.markdown("Developed by: [Mila Alex, CFA](https://www.linkedin.com/in/
 st.sidebar.markdown("---")
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
-
 # GLOBAL AUTOSIZING & STYLING CONFIGURATION FOR ALL PACKAGES
 DEFAULT_PALETTE = "Warm Amber"  # Set your fallback brand color scheme here
 
-
-# GLOBAL AUTOSIZING CONFIGURATION FOR ALL GRAPHICS
+# ==============================================================================
+# GLOBAL ADAPTIVE CONFIGURATION & ENVIRONMENT DETECTION
+# ==============================================================================
 if get_script_run_ctx() is not None:
-    # Running inside Streamlit: enforce the standardized corporate layout width
+    # Active Streamlit Server Session
     DEFAULT_WIDTH = 1400
     DEFAULT_AUTOSIZE = False
+
+    # Securely inject custom CSS styles to override standard tab sizing limits
+    st.markdown(r"""
+        <style>
+            /* Scale up font styling inside tab headers */
+            button[data-baseweb="tab"] {
+                font-size: 22px !important;
+                font-weight: bold !important;
+            }
+            button[data-baseweb="tab"] * {
+                font-size: 22px !important;
+                font-weight: bold !important;
+                font-family: 'Arial', sans-serif !important;
+            }
+            [data-baseweb="tab-list"] button div {
+                font-size: 22px !important;
+                font-weight: bold !important;
+            }
+            
+            /* Set minimum tab panel height to suppress viewport page jumps during chart re-rendering */
+            .stTabs [data-baseweb="tab-panel"] {
+                min-height: 800px !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 else:
-    # Running inside Jupyter / Colab: enable 100% responsive fluid scaling to fit the viewport
+    # Standalone Execution (Jupyter Notebook / Google Colab Module Import)
     DEFAULT_WIDTH = None
     DEFAULT_AUTOSIZE = True
 
-
-if get_script_run_ctx() is not None:
-    st.markdown(r"""
-    <style>
-        /* Scale up font styling inside tab headers */
-        button[data-baseweb="tab"] {
-            font-size: 22px !important;
-            font-weight: bold !important;
-        }
-        button[data-baseweb="tab"] * {
-            font-size: 22px !important;
-            font-weight: bold !important;
-            font-family: 'Arial', sans-serif !important;
-        }
-        [data-baseweb="tab-list"] button div {
-            font-size: 22px !important;
-            font-weight: bold !important;
-        }
-        
-        /* Set minimum tab panel height to suppress viewport page jumps during chart re-rendering */
-        .stTabs [data-baseweb="tab-panel"] {
-            min-height: 800px !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
 
 # =============================================================================
 # GLOBAL SESSION STATE MATRIX & TYPOGRAPHY ANCHORS (PEP 8 COMPLIANT)
@@ -89,8 +89,6 @@ def sync_global_session_variable(tab_key, state_target_key):
 # =========================================================================
 # GLOBAL VISUAL CONFIGURATION (DEFAULT CHART SIZES)
 # =========================================================================
-DEFAULT_CHART_WIDTH = 1500
-DEFAULT_CHART_HEIGHT = 750
 
 
 # Global Dictionary of Palettes
@@ -261,15 +259,14 @@ def check_is_aggregated_data(df, stage_nodes, target_node):
 
 def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
                      chart_title="Parallel Categories Flow", title_size=20, title_x=0.0,
-                     width_px=1500, height_px=560):
+                     width_px=None, height_px=560):
 
     # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
     chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
 
     # 2. Extract the actual list of HEX colors from the dictionary if a string label is provided
-    # Note: Ensure 'COLOR_SCHEMES' matches the exact name of your color catalog dictionary
     if isinstance(chosen_scheme, str):
-        final_palette = COLOR_SCHEMES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
+        final_palette = COLOR_PALETTES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
     else:
         final_palette = chosen_scheme
 
@@ -415,15 +412,14 @@ def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette=N
 
 def generate_funnel_chart(df, stage_nodes, target_node, value_col, selected_route_dict, selected_palette=None, unit_divider=1.0, force_shuffle=False,
                           chart_title="Pipeline Stage Conversion", title_size=20, title_x=0.0,
-                          width_px=1100, height_px=550):
+                          width_px=None, height_px=550):
 
     # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
     chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
 
     # 2. Extract the actual list of HEX colors from the dictionary if a string label is provided
-    # Note: Ensure 'COLOR_SCHEMES' matches the exact name of your color catalog dictionary
     if isinstance(chosen_scheme, str):
-        final_palette = COLOR_SCHEMES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
+        final_palette = COLOR_PALETTES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
     else:
         final_palette = chosen_scheme
 
@@ -528,15 +524,14 @@ def generate_funnel_chart(df, stage_nodes, target_node, value_col, selected_rout
 
 def generate_stacked_bar_chart(df, stage_nodes, target_node, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
                                chart_title="Structural Composition Breakdown", title_size=20, title_x=0.0,
-                               width_px=1100, height_px=550):
+                               width_px=None, height_px=550):
 
     # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
     chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
 
     # 2. Extract the actual list of HEX colors from the dictionary if a string label is provided
-    # Note: Ensure 'COLOR_SCHEMES' matches the exact name of your color catalog dictionary
     if isinstance(chosen_scheme, str):
-        final_palette = COLOR_SCHEMES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
+        final_palette = COLOR_PALETTES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
     else:
         final_palette = chosen_scheme
 
@@ -675,15 +670,14 @@ def generate_stacked_bar_chart(df, stage_nodes, target_node, value_col, selected
 
 def generate_bento_treemap(df, id_col, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
                            chart_title="Bento Treemap Dashboard", title_size=20, title_x=0.0,
-                           width_px=1100, height_px=550):
+                           width_px=None, height_px=550):
 
     # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
     chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
 
     # 2. Extract the actual list of HEX colors from the dictionary if a string label is provided
-    # Note: Ensure 'COLOR_SCHEMES' matches the exact name of your color catalog dictionary
     if isinstance(chosen_scheme, str):
-        final_palette = COLOR_SCHEMES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
+        final_palette = COLOR_PALETTES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
     else:
         final_palette = chosen_scheme
 
@@ -795,15 +789,14 @@ def generate_bento_treemap(df, id_col, value_col, selected_palette=None, unit_di
 
 def generate_heatmap(df, x_col, y_col, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
                      chart_title="Category Intersection & Density Matrix", title_size=20, title_x=0.0,
-                     width_px=1100, height_px=550,show_annot=False):
+                     width_px=None, height_px=550, show_annot=False):
 
     # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
     chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
 
     # 2. Extract the actual list of HEX colors from the dictionary if a string label is provided
-    # Note: Ensure 'COLOR_SCHEMES' matches the exact name of your color catalog dictionary
     if isinstance(chosen_scheme, str):
-        final_palette = COLOR_SCHEMES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
+        final_palette = COLOR_PALETTES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
     else:
         final_palette = chosen_scheme
 
@@ -912,15 +905,14 @@ def generate_heatmap(df, x_col, y_col, value_col, selected_palette=None, unit_di
 
 def generate_outliers_chart(df, stage_col, target_col, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
                             chart_title="Transaction Outlier & Anomaly Analysis", title_size=20, title_x=0.0,
-                            width_px=1100, height_px=550):
+                            width_px=None, height_px=550):
 
     # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
     chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
 
     # 2. Extract the actual list of HEX colors from the dictionary if a string label is provided
-    # Note: Ensure 'COLOR_SCHEMES' matches the exact name of your color catalog dictionary
     if isinstance(chosen_scheme, str):
-        final_palette = COLOR_SCHEMES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
+        final_palette = COLOR_PALETTES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
     else:
         final_palette = chosen_scheme
 
