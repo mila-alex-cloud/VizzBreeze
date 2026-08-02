@@ -3,7 +3,14 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 import random
+import logging
 from streamlit.runtime.scriptrunner import get_script_run_ctx
+
+# FORCIBLY SILENCE INTERNAL STREAMLIT LOGGING OUTSIDE ACTIVE SERVER SESSIONS
+if get_script_run_ctx() is None:
+    # Completely suppress Streamlit background warnings and context noise in Jupyter
+    logging.getLogger("streamlit").setLevel(logging.ERROR)
+
 
 st.set_page_config(
     layout="wide",
