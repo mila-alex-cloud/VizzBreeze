@@ -18,39 +18,38 @@ A lightweight, high-performance transactional web-dashboard designed for advance
 
 ## Quick Start
 
-#### Local Execution (Recommended)
-Just open your terminal and run the control room directly:
+#### 1. Standard Python / Jupyter Notebook Usage
+VizzBreeze functions process un-aggregated raw DataFrames and return native Plotly figures, making them fully compatible with Jupyter views and pipeline automation:
+
+```python
+import vizzbreeze as vb
+import pandas as pd
+
+# Load raw transaction logs
+df = pd.read_csv("transactions.csv")
+
+# Generate advanced Parcats flow directly in your notebook
+fig = vb.generate_parcats(
+    df=df, 
+    stage_nodes=['client', 'fund'], 
+    target_node='asset', 
+    value_col='amount'
+)
+fig.show()
+```
+
+#### 2. Standalone Web Control Room Execution
+If you prefer a full-scale interactive UI with global layout sync, just open your local terminal and run:
+
 ```bash
 vizzbreeze-run
 ```
 
-#### Cloud Execution (Google Colab / Kaggle)
-If you are running inside a cloud notebook, use a tunnel proxy to access the web port:
-```bash
-!npx localtunnel --port 8501 & vizzbreeze-run
-```
+#### Cloud Execution
+If you explicitly need to run VizzBreeze in cloud environments like Google Colab, please use a secure SSH/Port-forwarding tunnel to bypass iframe infrastructure limits.
 
-### Cloud Notebook Tip (Google Colab)
-If you experience connection drops or errors with `localtunnel` while uploading files in cloud environments, we highly recommend switching to **ngrok** for a rock-solid connection:
-
-```python
-!pip install pyngrok
-!ngrok config add-authtoken <YOUR_NGROK_TOKEN>
-
-from pyngrok import ngrok
-print("Stable Link:", ngrok.connect(8501, "http"))
-!vizzbreeze-run
-```
-
-**Test Dataset**: To explore the dashboard features instantly, you can use the pre-configured spreadsheet **`sample_data_unaggregated.xlsx`** located in the root folder of this repository. Just drag and drop it into the sidebar upload zone!
-
-## Jupyter Notebook Integration
-
-VizzBreeze is fully compatible with Jupyter Notebooks. You can import individual chart engines independently to render interactive Plotly visualizations directly within your notebook cells:
-
-## Jupyter Notebook Advanced Integration
-
-VizzBreeze functions return native `plotly.graph_objects.Figure` instances, making them fully compatible with Jupyter Notebook visualization viewports.
+## Test Dataset
+To explore the dashboard features instantly, you can use the pre-configured spreadsheet **`sample_data_unaggregated.xlsx`** located in the root folder of this repository. Just drag and drop it into the sidebar upload zone!
 
 ### Accessing Built-in Color Palettes
 You don't need to hardcode HEX styles. Access the corporate design system directly from the package configuration:
