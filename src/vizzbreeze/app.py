@@ -283,7 +283,6 @@ def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette=N
         random.seed(force_shuffle)
     random.shuffle(working_colors)
 
-
     if not stage_nodes:
         return go.Figure()
 
@@ -369,7 +368,7 @@ def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette=N
             axis_label = f"{idx+1}. STAGE ({col.upper()})"
 
         parcats_dimensions.append({
-            "label": axis_label,
+            # "label": axis_label,
             "values": column_values_as_keys,
             "categoryorder": "array",
             "categoryarray": category_array,
@@ -382,7 +381,7 @@ def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette=N
         line={"color": df_grouped["color_val"].tolist(), "shape": "hspline"},
         counts=df_grouped["volume_val"].tolist(),
 
-        # UNIFIED TYPOGRAPHY STYLE: Identical font parameters matched with your Funnel trace settings
+        # UNIFIED TYPOGRAPHY STYLE: Identical font parameters matched with the Funnel trace settings
         labelfont=dict(color="#000000", size=11, family="Arial"),
         tickfont=dict(color="#000000", size=11, family="Arial"),
 
@@ -394,13 +393,42 @@ def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette=N
     final_width = width_px if width_px is not None else DEFAULT_WIDTH
     final_autosize = DEFAULT_AUTOSIZE if width_px is None else False
 
-    # UNIFIED LAYOUT ARCHITECTURE: Matched with your corporate reporting layout standard
+    # DYNAMIC ANNOTATION ENGINE: Automatically builds centered titles for each column layer
+    # Stage 1 is at X=0 (left), Stage 2 (if exists) or Destination is distributed evenly up to X=1 (right)
+    num_stages = len(stage_nodes)
+    chart_annotations = []
+
+    # 1. Generate annotations for sequential stages
+    for idx, node in enumerate(stage_nodes):
+        # Calculate strict horizontal positioning between 0.0 and 1.0
+        x_pos = idx / num_stages if num_stages > 0 else 0.0
+        chart_annotations.append(dict(
+            x=x_pos, y=1.07, # y=1.07 elevates text safely above the column nodes
+            xref="paper", yref="paper",
+            text=f"{idx + 1}. STAGE ({str(node).upper()})",
+            showarrow=False,
+            font=dict(size=12, family="Arial", color="#1f1f1f", weight="bold"),
+            xanchor="center" if x_pos > 0 and x_pos < 1 else ("left" if x_pos == 0 else "right")
+        ))
+
+    # 2. Append the terminal destination layer annotation at the exact right boundary (X=1.0)
+    chart_annotations.append(dict(
+        x=1.0, y=1.07,
+        xref="paper", yref="paper",
+        text=f"FINAL DESTINATION ({str(target_node).upper()})",
+        showarrow=False,
+        font=dict(size=12, family="Arial", color="#1f1f1f", weight="bold"),
+        xanchor="right"
+    ))
+
+    # UNIFIED LAYOUT ARCHITECTURE: Matched with the corporate reporting layout standard
     fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         plot_bgcolor="white", paper_bgcolor="white",
         height=height_px,
         width=final_width,
         autosize=final_autosize,
+        annotations=chart_annotations,
 
         # FIXED VERTICAL GAP: Increased t (top margin) to 100 to push the chart down and restore the header spacing
         margin=dict(l=150, r=150, t=100, b=40),
@@ -660,7 +688,8 @@ def generate_stacked_bar_chart(df, stage_nodes, target_node, value_col, selected
         margin=dict(l=60, r=40, t=60, b=120),
         xaxis=dict(title=dict(
                 text=' ➔ '.join([str(c).upper() for c in x_cols]),
-                font=dict(size=12, family="Arial", color="#1f1f1f")
+                font=dict(size=12, family="Arial", color="#1f1f1f"),
+                standoff=20
             ), showgrid=False, linecolor='#000000', tickangle=270),
         yaxis=dict(title=dict(
                 text=value_col,
