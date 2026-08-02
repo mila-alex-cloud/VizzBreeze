@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 import random
+from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 st.set_page_config(
     layout="wide",
@@ -15,14 +16,24 @@ st.sidebar.title("VizzBreeze")
 st.sidebar.markdown("*From Chaos to Clarity*")
 st.sidebar.markdown("Developed by: [Mila Alex, CFA](https://www.linkedin.com/in/mila-alex-cfa/)")
 st.sidebar.markdown("---")
-
-
-# Inject custom stylesheets to enforce consistent font styling and smooth layout transitions
-import streamlit as st
-
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
-# Проверяем, запущен ли код внутри Streamlit-приложения
+
+# GLOBAL AUTOSIZING & STYLING CONFIGURATION FOR ALL PACKAGES
+DEFAULT_PALETTE = "Warm Amber"  # Set your fallback brand color scheme here
+
+
+# GLOBAL AUTOSIZING CONFIGURATION FOR ALL GRAPHICS
+if get_script_run_ctx() is not None:
+    # Running inside Streamlit: enforce the standardized corporate layout width
+    DEFAULT_WIDTH = 1400
+    DEFAULT_AUTOSIZE = False
+else:
+    # Running inside Jupyter / Colab: enable 100% responsive fluid scaling to fit the viewport
+    DEFAULT_WIDTH = None
+    DEFAULT_AUTOSIZE = True
+
+
 if get_script_run_ctx() is not None:
     st.markdown(r"""
     <style>
@@ -126,6 +137,8 @@ COLOR_PALETTES = {
     ]
 }
 
+palette_options = list(COLOR_PALETTES.keys())
+default_index = palette_options.index(DEFAULT_PALETTE)
 
 # 1. Defining all the necessary functions
 def get_smart_brand_color(index, palette_list):
@@ -246,15 +259,26 @@ def check_is_aggregated_data(df, stage_nodes, target_node):
     return False  # Data structure is flat (valid transaction log context)
 
 
-def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette, unit_divider=1.0, force_shuffle=False,
+def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
                      chart_title="Parallel Categories Flow", title_size=20, title_x=0.0,
                      width_px=1500, height_px=560):
-    # FIXED: Local import statements removed (moved to the top of app.py)
 
-    working_colors = selected_palette.copy()
+    # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
+    chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
+
+    # 2. Extract the actual list of HEX colors from the dictionary if a string label is provided
+    # Note: Ensure 'COLOR_SCHEMES' matches the exact name of your color catalog dictionary
+    if isinstance(chosen_scheme, str):
+        final_palette = COLOR_SCHEMES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
+    else:
+        final_palette = chosen_scheme
+
+    # 3. Securely clone the localized list and execute the pseudo-random positioning layout
+    working_colors = final_palette.copy()
     if isinstance(force_shuffle, int):
         random.seed(force_shuffle)
     random.shuffle(working_colors)
+
 
     if not stage_nodes:
         return go.Figure()
@@ -363,11 +387,16 @@ def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette, 
         hoverinfo='count+probability'
     )])
 
+    final_width = width_px if width_px is not None else DEFAULT_WIDTH
+    final_autosize = DEFAULT_AUTOSIZE if width_px is None else False
+
     # UNIFIED LAYOUT ARCHITECTURE: Matched with your corporate reporting layout standard
     fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         plot_bgcolor="white", paper_bgcolor="white",
-        width=width_px, height=height_px,
+        height=height_px,
+        width=final_width,
+        autosize=final_autosize,
 
         # FIXED VERTICAL GAP: Increased t (top margin) to 100 to push the chart down and restore the header spacing
         margin=dict(l=150, r=150, t=100, b=40),
@@ -384,11 +413,22 @@ def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette, 
     return fig
 
 
-def generate_funnel_chart(df, stage_nodes, target_node, value_col, selected_route_dict, selected_palette, unit_divider=1.0, force_shuffle=False,
+def generate_funnel_chart(df, stage_nodes, target_node, value_col, selected_route_dict, selected_palette=None, unit_divider=1.0, force_shuffle=False,
                           chart_title="Pipeline Stage Conversion", title_size=20, title_x=0.0,
                           width_px=1100, height_px=550):
 
-    working_colors = selected_palette.copy()
+    # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
+    chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
+
+    # 2. Extract the actual list of HEX colors from the dictionary if a string label is provided
+    # Note: Ensure 'COLOR_SCHEMES' matches the exact name of your color catalog dictionary
+    if isinstance(chosen_scheme, str):
+        final_palette = COLOR_SCHEMES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
+    else:
+        final_palette = chosen_scheme
+
+    # 3. Securely clone the localized list and execute the pseudo-random positioning layout
+    working_colors = final_palette.copy()
     if isinstance(force_shuffle, int):
         random.seed(force_shuffle)
     random.shuffle(working_colors)
@@ -470,23 +510,38 @@ def generate_funnel_chart(df, stage_nodes, target_node, value_col, selected_rout
         marker=dict(color=color_sequence, line=dict(color="#FFFFFF", width=2))
     ))
 
+    final_width = width_px if width_px is not None else DEFAULT_WIDTH
+    final_autosize = DEFAULT_AUTOSIZE if width_px is None else False
+
     fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         plot_bgcolor="white",
         paper_bgcolor="white",
-        width=width_px,
         height=height_px,
+        width=final_width,
+        autosize=final_autosize,
         margin=dict(l=250, r=40, t=60, b=60),
         separators=" ."
     )
     return fig
 
 
-def generate_stacked_bar_chart(df, stage_nodes, target_node, value_col, selected_palette, unit_divider=1.0, force_shuffle=False,
+def generate_stacked_bar_chart(df, stage_nodes, target_node, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
                                chart_title="Structural Composition Breakdown", title_size=20, title_x=0.0,
                                width_px=1100, height_px=550):
 
-    working_colors = selected_palette.copy()
+    # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
+    chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
+
+    # 2. Extract the actual list of HEX colors from the dictionary if a string label is provided
+    # Note: Ensure 'COLOR_SCHEMES' matches the exact name of your color catalog dictionary
+    if isinstance(chosen_scheme, str):
+        final_palette = COLOR_SCHEMES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
+    else:
+        final_palette = chosen_scheme
+
+    # 3. Securely clone the localized list and execute the pseudo-random positioning layout
+    working_colors = final_palette.copy()
     if isinstance(force_shuffle, int):
         random.seed(force_shuffle)
     random.shuffle(working_colors)
@@ -592,11 +647,14 @@ def generate_stacked_bar_chart(df, stage_nodes, target_node, value_col, selected
             marker=dict(color=color_map[cat], line=dict(color='#FFFFFF', width=0.5))
         ))
 
+    final_width = width_px if width_px is not None else DEFAULT_WIDTH
+    final_autosize = DEFAULT_AUTOSIZE if width_px is None else False
+
     # Apply corporate reporting layout architecture using the British dot standard
     fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         barmode='stack', plot_bgcolor="white", paper_bgcolor="white",
-        width=width_px, height=height_px,
+        height=height_px, width=final_width, autosize=final_autosize,
         margin=dict(l=60, r=40, t=60, b=120),
         xaxis=dict(title=dict(
                 text=' ➔ '.join([str(c).upper() for c in x_cols]),
@@ -615,11 +673,22 @@ def generate_stacked_bar_chart(df, stage_nodes, target_node, value_col, selected
     )
     return fig
 
-def generate_bento_treemap(df, id_col, value_col, selected_palette, unit_divider=1.0, force_shuffle=False,
+def generate_bento_treemap(df, id_col, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
                            chart_title="Bento Treemap Dashboard", title_size=20, title_x=0.0,
                            width_px=1100, height_px=550):
 
-    working_colors = selected_palette.copy()
+    # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
+    chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
+
+    # 2. Extract the actual list of HEX colors from the dictionary if a string label is provided
+    # Note: Ensure 'COLOR_SCHEMES' matches the exact name of your color catalog dictionary
+    if isinstance(chosen_scheme, str):
+        final_palette = COLOR_SCHEMES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
+    else:
+        final_palette = chosen_scheme
+
+    # 3. Securely clone the localized list and execute the pseudo-random positioning layout
+    working_colors = final_palette.copy()
     if isinstance(force_shuffle, int):
         random.seed(force_shuffle)
     random.shuffle(working_colors)
@@ -707,22 +776,39 @@ def generate_bento_treemap(df, id_col, value_col, selected_palette, unit_divider
         textfont=dict(size=14, color="black")
     ))
 
+    final_width = width_px if width_px is not None else DEFAULT_WIDTH
+    final_autosize = DEFAULT_AUTOSIZE if width_px is None else False
+
     # Apply corporate reporting layout architecture using the British dot standard
     fig_bento.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
-        plot_bgcolor="white", paper_bgcolor="white",
-        width=width_px, height=height_px,
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        height=height_px,
+        width=final_width,
+        autosize=final_autosize,
         margin=dict(l=20, r=20, t=60, b=20),
         separators="."
     )
     return fig_bento
 
 
-def generate_heatmap(df, x_col, y_col, value_col, selected_palette, unit_divider=1.0, force_shuffle=False,
+def generate_heatmap(df, x_col, y_col, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
                      chart_title="Category Intersection & Density Matrix", title_size=20, title_x=0.0,
                      width_px=1100, height_px=550,show_annot=False):
 
-    working_colors = selected_palette.copy()
+    # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
+    chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
+
+    # 2. Extract the actual list of HEX colors from the dictionary if a string label is provided
+    # Note: Ensure 'COLOR_SCHEMES' matches the exact name of your color catalog dictionary
+    if isinstance(chosen_scheme, str):
+        final_palette = COLOR_SCHEMES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
+    else:
+        final_palette = chosen_scheme
+
+    # 3. Securely clone the localized list and execute the pseudo-random positioning layout
+    working_colors = final_palette.copy()
     if isinstance(force_shuffle, int):
         random.seed(force_shuffle)
     random.shuffle(working_colors)
@@ -806,10 +892,14 @@ def generate_heatmap(df, x_col, y_col, value_col, selected_palette, unit_divider
 
     fig = go.Figure(data=heatmap_trace)
 
+    final_width = width_px if width_px is not None else DEFAULT_WIDTH
+    final_autosize = DEFAULT_AUTOSIZE if width_px is None else False
+
     fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
-        width=width_px,
         height=height_px,
+        width=final_width,
+        autosize=final_autosize,
         margin=dict(l=120, r=40, t=60, b=120),
         xaxis=dict(tickangle=0, type='category', scaleanchor="y", scaleratio=1),
         yaxis=dict(type='category'),
@@ -820,11 +910,22 @@ def generate_heatmap(df, x_col, y_col, value_col, selected_palette, unit_divider
     return fig
 
 
-def generate_outliers_chart(df, stage_col, target_col, value_col, selected_palette, unit_divider=1.0, force_shuffle=False,
+def generate_outliers_chart(df, stage_col, target_col, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
                             chart_title="Transaction Outlier & Anomaly Analysis", title_size=20, title_x=0.0,
                             width_px=1100, height_px=550):
 
-    working_colors = selected_palette.copy()
+    # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
+    chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
+
+    # 2. Extract the actual list of HEX colors from the dictionary if a string label is provided
+    # Note: Ensure 'COLOR_SCHEMES' matches the exact name of your color catalog dictionary
+    if isinstance(chosen_scheme, str):
+        final_palette = COLOR_SCHEMES.get(chosen_scheme, ["#FFBF00", "#FF7E00"]) # Fallback lists
+    else:
+        final_palette = chosen_scheme
+
+    # 3. Securely clone the localized list and execute the pseudo-random positioning layout
+    working_colors = final_palette.copy()
     if isinstance(force_shuffle, int):
         random.seed(force_shuffle)
     random.shuffle(working_colors)
@@ -901,11 +1002,14 @@ def generate_outliers_chart(df, stage_col, target_col, value_col, selected_palet
         customdata=["Anomaly (Outlier)" if out else "Normal Transaction" for out in df_analysis['IS_OUTLIER']]
     ))
 
+    final_width = width_px if width_px is not None else DEFAULT_WIDTH
+    final_autosize = DEFAULT_AUTOSIZE if width_px is None else False
+
     # Apply corporate dashboard presentation configuration using the British dot standard
     fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         plot_bgcolor="white", paper_bgcolor="white",
-        width=width_px, height=height_px,
+        height=height_px, width=final_width, autosize=final_autosize,
         margin=dict(l=250, r=40, t=60, b=60),
         xaxis=dict(title=f"AGGREGATED VOLUME ({value_col.upper()})",
                    showgrid=True,
@@ -990,7 +1094,8 @@ if uploaded_file is not None:
     # Dropdown interface mapping targeting system theme color layouts
     selected_palette = st.sidebar.selectbox(
         "",
-        options=list(COLOR_PALETTES.keys())
+        options=list(COLOR_PALETTES.keys()),
+        index=default_index
     )
 
     chosen_colors = COLOR_PALETTES[selected_palette]
