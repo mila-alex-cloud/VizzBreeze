@@ -540,11 +540,6 @@ def generate_funnel_chart(df, stage_nodes, target_node, value_col, selected_rout
         marker=dict(color=color_sequence, line=dict(color="#FFFFFF", width=2))
     ))
 
-
-    # Automatically calculate dynamic left margin based on the longest text label
-    longest_step_len = df[stage_col].astype(str).str.len().max()
-    dynamic_funnel_margin = max(100, longest_step_len * 7.5)
-
     fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         plot_bgcolor="white",
@@ -816,7 +811,7 @@ def generate_bento_treemap(df, id_col, value_col, width_px, height_px, selected_
 
 
 def generate_heatmap(df, x_col, y_col, value_col, width_px, height_px, selected_palette=None, unit_divider=1.0, force_shuffle=False,
-                     chart_title="Category Intersection & Density Matrix", title_size=20, title_x=0.0,
+                     chart_title="Category Intersection & Heatmap", title_size=20, title_x=0.0,
                      show_annot=False):
 
     # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
@@ -1009,10 +1004,6 @@ def generate_outliers_chart(df, stage_col, target_col, value_col,
         "<b>Status:</b> %{customdata}<extra></extra>"
     )
 
-    # FIXED: Read from computed ENTITY_ID to prevent string conversion/NaN crashes
-    longest_outlier_label = df_analysis['ENTITY_ID'].apply(lambda x: len(str(x))).max() if not df_analysis.empty else 100
-    dynamic_outlier_margin = max(150, longest_outlier_label * 7.0)
-
     # Render a high-fidelity visual audit report layout
     fig = go.Figure(go.Bar(
         y=df_analysis['ENTITY_ID'],
@@ -1038,7 +1029,7 @@ def generate_outliers_chart(df, stage_col, target_col, value_col,
         plot_bgcolor="white", paper_bgcolor="white",
         height=height_px, width=width_px, autosize=False,
         # UPDATED: Injected dynamic left margin calculation to prevent text truncation
-        margin=dict(l=int(dynamic_outlier_margin), r=40, t=60, b=60),
+        margin=dict(l=120, r=40, t=60, b=60),
         xaxis=dict(title=xaxis_label, # UPDATED: Using dynamic context label here
                    showgrid=True,
                    gridcolor='#E5E5E5',
@@ -1174,7 +1165,7 @@ if uploaded_file is not None:
         "2. Funnel",
         "3. Structural Breakdown",
         "4. Bento",
-        "5. Density Matrix",
+        "5. Heatmap",
         "6. Anomaly & Risk Audit"
     ])
 
@@ -1679,10 +1670,10 @@ if uploaded_file is not None:
         )
 
     # =============================================================================
-    # TAB 5: DENSITY MATRIX (HEATMAP DENSITY ARCHITECTURE)
+    # TAB 5: HEATMAP DENSITY ARCHITECTURE
     # =============================================================================
     with tab_matrix:
-        st.subheader("Density Matrix")
+        st.subheader("Heatmap")
         st.write(
             "**Best for:** Density analysis to instantly spot where two dimensions cross "
             "with the highest volume or transaction activity over temporal cycles."
@@ -1723,7 +1714,7 @@ if uploaded_file is not None:
                 args=("local_title_size_heatmap", "global_title_size")
             )
 
-        # Control Panel Section 2: Axis Mapping and Grid Density Configuration
+        # Control Panel Section 2: Axis Mapping and Heatmap Configuration
         h_ctrl1, h_ctrl2, h_ctrl3, mat_ctrl_col4 = st.columns(4)
         with h_ctrl1:
             x_axis_heatmap = st.selectbox(
@@ -1780,7 +1771,7 @@ if uploaded_file is not None:
         base_seed = st.session_state.get("current_seed", 42)
         use_shuffle_heat = base_seed + (palette_indices.get(selected_palette, 0) * 100) + 400
 
-        # Initialize the automated density matrix aggregation engine
+        # Initialize the automated heatmap aggregation engine
         fig_heatmap = generate_heatmap(
             df=opt_table,
             x_col=x_axis_heatmap,

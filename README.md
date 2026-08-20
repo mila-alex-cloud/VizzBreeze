@@ -71,7 +71,7 @@ chosen_colors = vb.COLOR_PALETTES["Warm Amber"]
 2. **Funnel**: Track progressive conversion drops along specific workflow layers.
 3. **Structural Breakdown**: Classic stacked column bar charts configured with responsive axis titles that update on the fly based on active filters.
 4. **Bento**: An asymmetrical modular tile framework designed to compress complex multi-level dimensions (like Token Consumption Footprints) into a clean, prioritized grid dashboard.
-5. **Density Matrix**: High-density dashboard to scan cluster intersections instantly.
+5. **Heatmap**: High-density dashboard to scan cluster intersections instantly.
 5. **Anomaly & Risk Audit**: Automated statistical anomaly profiling that detects execution latency spikes and infinite loop outliers without freezing the browser engine.
 
 ### Core Functions API Reference & Parameter Mapping
@@ -97,6 +97,8 @@ flow_fig = vb.generate_parcats(
 
 flow_fig.show()
 ```
+
+
 <img width="867" height="266" alt="image" src="https://github.com/user-attachments/assets/71925812-abc1-4d78-a68f-9e497a6dcf3f" />
 
 ### 2. Funnel
@@ -125,6 +127,8 @@ fig.update_layout(
     margin=dict(l=350, r=20, t=100, b=50)
 )
 ```
+
+
 <img width="575" height="249" alt="image" src="https://github.com/user-attachments/assets/78f14331-6bdd-4ea4-96b7-8953fd52edd7" />
 
 ### 3. Structural Breakdown
@@ -158,6 +162,8 @@ fig.update_layout(
 
 fig.show()
 ```
+
+
 <img width="869" height="278" alt="image" src="https://github.com/user-attachments/assets/3e6dd8d4-8a50-464f-99f5-151eeb7c51dd" />
 
 ### 4. Bento
@@ -179,9 +185,11 @@ fig.update_layout(
     )
 fig.show()
 ```
+
+
 <img width="562" height="257" alt="image" src="https://github.com/user-attachments/assets/4a147f48-3e30-47ea-97ab-8956f4f2c13d" />
 
-### 5. Density Matrix
+### 5. Heatmap
 ```python
 fig = vb.generate_heatmap(
     df=df,
@@ -205,6 +213,7 @@ fig.update_layout(
 fig.show()
 ```
 
+
 <img width="582" height="280" alt="image" src="https://github.com/user-attachments/assets/d46b91f3-b557-4fd1-84f6-13d5528568fe" />
 
 ### 6. Anomaly & Risk Audit
@@ -214,6 +223,7 @@ anomaly_fig = vb.generate_outliers_chart(
     stage_col='active_agent',
     target_col='tool_called',
     value_col='execution_time_sec',
+    agg_func='max', 
     chart_title="AI Execution Latency Anomaly Profile (IQR Bounds)",
     selected_palette=chosen_colors,
     width_px=1050,
@@ -221,7 +231,7 @@ anomaly_fig = vb.generate_outliers_chart(
     title_x=0.5
 )
 
-anomaly_fig.update_xaxes(title_text="TOTAL ACCUMULATED LATENCY (SEC)")
+anomaly_fig.update_xaxes(title_text="MAX SINGLE-RUN EXECUTION TIME (SEC)")
 
 anomaly_fig.update_layout(
     margin=dict(l=310, r=20, t=50, b=50)
@@ -229,9 +239,11 @@ anomaly_fig.update_layout(
 anomaly_fig.show()
 ```
 
-<img width="580" height="280" alt="image" src="https://github.com/user-attachments/assets/f6568901-5fee-4c2b-aa25-d5350b5dab8c" />
+![AI Execution Latency Anomaly Profile](https://githubusercontent.com)
+
 
 ## Requirements
+
 
 - Python >= 3.9
 - Streamlit >= 1.35.0

@@ -1,4 +1,9 @@
-# EXPOSE CHANNELS FOR JUPYTER NOTEBOOK EMBEDDING
+# 1. SILENCE INTERNAL STREAMLIT LOGGING BEFORE ANY MODULE IMPORTS
+import logging
+logging.getLogger("streamlit.runtime.scriptrunner_utils").setLevel(logging.ERROR)
+logging.getLogger("streamlit").setLevel(logging.ERROR)
+
+# 2. EXPOSE CHANNELS FOR JUPYTER NOTEBOOK EMBEDDING
 from vizzbreeze.app import generate_parcats
 from vizzbreeze.app import generate_heatmap
 from vizzbreeze.app import generate_funnel_chart
@@ -18,3 +23,4 @@ __all__ = [
     "generate_outliers_chart",
     "COLOR_PALETTES"
 ]
+
