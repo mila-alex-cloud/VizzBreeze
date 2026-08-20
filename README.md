@@ -239,8 +239,7 @@ anomaly_fig.update_layout(
 anomaly_fig.show()
 ```
 
-![AI Execution Latency Anomaly Profile](https://githubusercontent.com)
-
+<img width="580" height="280" alt="image" src="https://github.com/user-attachments/assets/12442eb0-d977-4894-9174-b9be0ba44fda" />
 
 ## Requirements
 
