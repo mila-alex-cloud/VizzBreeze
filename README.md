@@ -2,7 +2,7 @@
 
 # VizzBreeze
 
-A lightweight, high-performance transactional web-dashboard designed for advanced data flow analytics, multi-stage routing visualization, and statistical risk audit. Built natively on top of Streamlit, Pandas, and Plotly.
+A lightweight, high-performance transactional web-dashboard designed for advanced data flow analytics, multi-stage routing visualization, and statistical risk audit，and AI Agent trace visualization. Built natively on top of Streamlit, Pandas, and Plotly.
 
 ## Key Features
 
