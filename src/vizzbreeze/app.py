@@ -6,6 +6,24 @@ import random
 import logging
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
+def render_with_scroll(fig, width, height):
+
+    import streamlit as st
+    fig.update_layout(width=width, height=height, autosize=False)
+
+    st.markdown(f"""
+        <div style="overflow-x: auto; overflow-y: hidden; width: 100%; display: block;">
+            <style>
+
+                .stPlotlyChart > div {{
+                    width: {width}px !important;
+                    min-width: {width}px !important;
+                }}
+            </style>
+    """, unsafe_allow_html=True)
+    st.plotly_chart(fig, use_container_width=False)
+    st.markdown("</div>", unsafe_allow_html=True)
+
 # FORCIBLY SILENCE INTERNAL STREAMLIT LOGGING OUTSIDE ACTIVE SERVER SESSIONS
 if get_script_run_ctx() is None:
     # Completely suppress Streamlit background warnings and context noise in Jupyter
@@ -23,48 +41,34 @@ st.sidebar.title("VizzBreeze")
 st.sidebar.markdown("*From Chaos to Clarity*")
 st.sidebar.markdown("Developed by: [Mila Alex, CFA](https://www.linkedin.com/in/mila-alex-cfa/)")
 st.sidebar.markdown("---")
-from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 # GLOBAL AUTOSIZING & STYLING CONFIGURATION FOR ALL PACKAGES
 DEFAULT_PALETTE = "Warm Amber"  # Set your fallback brand color scheme here
 
-# ==============================================================================
-# GLOBAL ADAPTIVE CONFIGURATION & ENVIRONMENT DETECTION
-# ==============================================================================
-if get_script_run_ctx() is not None:
-    # Active Streamlit Server Session
-    DEFAULT_WIDTH = 1400
-    DEFAULT_AUTOSIZE = False
-
-    # Securely inject custom CSS styles to override standard tab sizing limits
-    st.markdown(r"""
-        <style>
-            /* Scale up font styling inside tab headers */
-            button[data-baseweb="tab"] {
-                font-size: 22px !important;
-                font-weight: bold !important;
-            }
-            button[data-baseweb="tab"] * {
-                font-size: 22px !important;
-                font-weight: bold !important;
-                font-family: 'Arial', sans-serif !important;
-            }
-            [data-baseweb="tab-list"] button div {
-                font-size: 22px !important;
-                font-weight: bold !important;
-            }
-            
-            /* Set minimum tab panel height to suppress viewport page jumps during chart re-rendering */
-            .stTabs [data-baseweb="tab-panel"] {
-                min-height: 800px !important;
-            }
-        </style>
-    """, unsafe_allow_html=True)
-else:
-    # Standalone Execution (Jupyter Notebook / Google Colab Module Import)
-    DEFAULT_WIDTH = None
-    DEFAULT_AUTOSIZE = True
-
+# Securely inject custom CSS styles to override standard tab sizing limits
+st.markdown(r"""
+    <style>
+        /* Scale up font styling inside tab headers */
+        button[data-baseweb="tab"] {
+            font-size: 22px !important;
+            font-weight: bold !important;
+        }
+        button[data-baseweb="tab"] * {
+            font-size: 22px !important;
+            font-weight: bold !important;
+            font-family: 'Arial', sans-serif !important;
+        }
+        [data-baseweb="tab-list"] button div {
+            font-size: 22px !important;
+            font-weight: bold !important;
+        }
+        
+        /* Set minimum tab panel height to suppress viewport page jumps during chart re-rendering */
+        .stTabs [data-baseweb="tab-panel"] {
+            min-height: 800px !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 # =============================================================================
 # GLOBAL SESSION STATE MATRIX & TYPOGRAPHY ANCHORS (PEP 8 COMPLIANT)
@@ -264,9 +268,8 @@ def check_is_aggregated_data(df, stage_nodes, target_node):
     return False  # Data structure is flat (valid transaction log context)
 
 
-def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
-                     chart_title="Parallel Categories Flow", title_size=20, title_x=0.0,
-                     width_px=None, height_px=560):
+def generate_parcats(df, stage_nodes, target_node, value_col, width_px, height_px, selected_palette=None, unit_divider=1.0, force_shuffle=False,
+                     chart_title="Parallel Categories Flow", title_size=20, title_x=0.0):
 
     # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
     chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
@@ -361,7 +364,6 @@ def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette=N
             # UNIFIED: Pure text token array. Plotly vectors handle the fonts natively via tickfont
             tick_text.append(f"{str(v)} - {formatted_vol}")
 
-        # FIXED: Removed the invalid dead branch checking for 'LEVEL_1' to eliminate NameError risks
         if col == target_node:
             axis_label = f"FINAL DESTINATION ({col.upper()})"
         else:
@@ -390,8 +392,6 @@ def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette=N
         hoverinfo='count+probability'
     )])
 
-    final_width = width_px if width_px is not None else DEFAULT_WIDTH
-    final_autosize = DEFAULT_AUTOSIZE if width_px is None else False
 
     # DYNAMIC ANNOTATION ENGINE: Automatically builds centered titles for each column layer
     # Stage 1 is at X=0 (left), Stage 2 (if exists) or Destination is distributed evenly up to X=1 (right)
@@ -407,7 +407,7 @@ def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette=N
             xref="paper", yref="paper",
             text=f"{idx + 1}. STAGE ({str(node).upper()})",
             showarrow=False,
-            font=dict(size=12, family="Arial", color="#1f1f1f", weight="bold"),
+            font=dict(size=12, family="Arial", color="#000000"),
             xanchor="center" if x_pos > 0 and x_pos < 1 else ("left" if x_pos == 0 else "right")
         ))
 
@@ -417,7 +417,7 @@ def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette=N
         xref="paper", yref="paper",
         text=f"FINAL DESTINATION ({str(target_node).upper()})",
         showarrow=False,
-        font=dict(size=12, family="Arial", color="#1f1f1f", weight="bold"),
+        font=dict(size=12, family="Arial", color="#000000"),
         xanchor="right"
     ))
 
@@ -426,8 +426,8 @@ def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette=N
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         plot_bgcolor="white", paper_bgcolor="white",
         height=height_px,
-        width=final_width,
-        autosize=final_autosize,
+        width=width_px,
+        autosize=False, #final_autosize,
         annotations=chart_annotations,
 
         # FIXED VERTICAL GAP: Increased t (top margin) to 100 to push the chart down and restore the header spacing
@@ -445,9 +445,8 @@ def generate_parcats(df, stage_nodes, target_node, value_col, selected_palette=N
     return fig
 
 
-def generate_funnel_chart(df, stage_nodes, target_node, value_col, selected_route_dict, selected_palette=None, unit_divider=1.0, force_shuffle=False,
-                          chart_title="Pipeline Stage Conversion", title_size=20, title_x=0.0,
-                          width_px=None, height_px=550):
+def generate_funnel_chart(df, stage_nodes, target_node, value_col, selected_route_dict, width_px, height_px, selected_palette=None, unit_divider=1.0, force_shuffle=False,
+                          chart_title="Pipeline Stage Conversion", title_size=20, title_x=0.0):
 
     # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
     chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
@@ -541,25 +540,26 @@ def generate_funnel_chart(df, stage_nodes, target_node, value_col, selected_rout
         marker=dict(color=color_sequence, line=dict(color="#FFFFFF", width=2))
     ))
 
-    final_width = width_px if width_px is not None else DEFAULT_WIDTH
-    final_autosize = DEFAULT_AUTOSIZE if width_px is None else False
+
+    # Automatically calculate dynamic left margin based on the longest text label
+    longest_step_len = df[stage_col].astype(str).str.len().max()
+    dynamic_funnel_margin = max(100, longest_step_len * 7.5)
 
     fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         plot_bgcolor="white",
         paper_bgcolor="white",
         height=height_px,
-        width=final_width,
-        autosize=final_autosize,
+        width=width_px,
+        autosize=False, #final_autosize,
         margin=dict(l=250, r=40, t=60, b=60),
         separators=" ."
     )
     return fig
 
 
-def generate_stacked_bar_chart(df, stage_nodes, target_node, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
-                               chart_title="Structural Composition Breakdown", title_size=20, title_x=0.0,
-                               width_px=None, height_px=550):
+def generate_stacked_bar_chart(df, stage_nodes, target_node, value_col, width_px, height_px, selected_palette=None, unit_divider=1.0, force_shuffle=False,
+                               chart_title="Structural Composition Breakdown", title_size=20, title_x=0.0):
 
     # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
     chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
@@ -677,14 +677,12 @@ def generate_stacked_bar_chart(df, stage_nodes, target_node, value_col, selected
             marker=dict(color=color_map[cat], line=dict(color='#FFFFFF', width=0.5))
         ))
 
-    final_width = width_px if width_px is not None else DEFAULT_WIDTH
-    final_autosize = DEFAULT_AUTOSIZE if width_px is None else False
 
     # Apply corporate reporting layout architecture using the British dot standard
     fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         barmode='stack', plot_bgcolor="white", paper_bgcolor="white",
-        height=height_px, width=final_width, autosize=final_autosize,
+        height=height_px, width=width_px, autosize=False, #final_autosize,
         margin=dict(l=60, r=40, t=60, b=120),
         xaxis=dict(title=dict(
                 text=' ➔ '.join([str(c).upper() for c in x_cols]),
@@ -704,9 +702,8 @@ def generate_stacked_bar_chart(df, stage_nodes, target_node, value_col, selected
     )
     return fig
 
-def generate_bento_treemap(df, id_col, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
-                           chart_title="Bento Treemap Dashboard", title_size=20, title_x=0.0,
-                           width_px=None, height_px=550):
+def generate_bento_treemap(df, id_col, value_col, width_px, height_px, selected_palette=None, unit_divider=1.0, force_shuffle=False,
+                           chart_title="Bento Treemap Dashboard", title_size=20, title_x=0.0):
 
     # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
     chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
@@ -742,9 +739,6 @@ def generate_bento_treemap(df, id_col, value_col, selected_palette=None, unit_di
         df_bento_clean[value_col] = pd.to_numeric(df_bento_clean[value_col], errors='coerce').fillna(0)
         value_col_internal = value_col
 
-    # =============================================================================
-    # CLEAN STREAMLINED BENTO MATRIX CORE ENGINE (GRAPH TRAVERSAL FULLY REMOVED)
-    # =============================================================================
     # If a list of columns is active, combine them into an end-to-end transactional track
     if len(active_cols) > 1:
         df_bento_clean['TARGET_ID'] = df_bento_clean[active_cols].agg(' ➔ '.join, axis=1)
@@ -806,8 +800,6 @@ def generate_bento_treemap(df, id_col, value_col, selected_palette=None, unit_di
         textfont=dict(size=14, color="black")
     ))
 
-    final_width = width_px if width_px is not None else DEFAULT_WIDTH
-    final_autosize = DEFAULT_AUTOSIZE if width_px is None else False
 
     # Apply corporate reporting layout architecture using the British dot standard
     fig_bento.update_layout(
@@ -815,17 +807,17 @@ def generate_bento_treemap(df, id_col, value_col, selected_palette=None, unit_di
         plot_bgcolor="white",
         paper_bgcolor="white",
         height=height_px,
-        width=final_width,
-        autosize=final_autosize,
+        width=width_px,
+        autosize=False, #final_autosize,
         margin=dict(l=20, r=20, t=60, b=20),
         separators="."
     )
     return fig_bento
 
 
-def generate_heatmap(df, x_col, y_col, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
+def generate_heatmap(df, x_col, y_col, value_col, width_px, height_px, selected_palette=None, unit_divider=1.0, force_shuffle=False,
                      chart_title="Category Intersection & Density Matrix", title_size=20, title_x=0.0,
-                     width_px=None, height_px=550, show_annot=False):
+                     show_annot=False):
 
     # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
     chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
@@ -865,9 +857,6 @@ def generate_heatmap(df, x_col, y_col, value_col, selected_palette=None, unit_di
         df_clean[value_col] = pd.to_numeric(df_clean[value_col], errors='coerce').fillna(0)
         value_col_internal = value_col
 
-    # =============================================================================
-    # STREAMLINED FLAT MATRIX PIVOT ENGINE (GRAPH TRAVERSAL FULLY REMOVED)
-    # =============================================================================
     # Directly assemble the intersection grid layout using native high-performance pivot operations
     if value_col == "Number of rows (Sample size)":
         df_pivot = df_clean.pivot_table(index=y_col, columns=x_col, aggfunc='size', fill_value=0)
@@ -921,14 +910,12 @@ def generate_heatmap(df, x_col, y_col, value_col, selected_palette=None, unit_di
 
     fig = go.Figure(data=heatmap_trace)
 
-    final_width = width_px if width_px is not None else DEFAULT_WIDTH
-    final_autosize = DEFAULT_AUTOSIZE if width_px is None else False
 
     fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         height=height_px,
-        width=final_width,
-        autosize=final_autosize,
+        width=width_px,
+        autosize=False, #final_autosize,
         margin=dict(l=120, r=40, t=60, b=120),
         xaxis=dict(tickangle=0, type='category', scaleanchor="y", scaleratio=1),
         yaxis=dict(type='category'),
@@ -939,9 +926,9 @@ def generate_heatmap(df, x_col, y_col, value_col, selected_palette=None, unit_di
     return fig
 
 
-def generate_outliers_chart(df, stage_col, target_col, value_col, selected_palette=None, unit_divider=1.0, force_shuffle=False,
-                            chart_title="Transaction Outlier & Anomaly Analysis", title_size=20, title_x=0.0,
-                            width_px=None, height_px=550):
+def generate_outliers_chart(df, stage_col, target_col, value_col,
+                            width_px, height_px, agg_func="sum", selected_palette=None, unit_divider=1.0, force_shuffle=False,
+                            chart_title="Transaction Outlier & Anomaly Analysis", title_size=20, title_x=0.0):
 
     # 1. Fallback to the global default scheme name if no custom palette is explicitly passed
     chosen_scheme = selected_palette if selected_palette is not None else DEFAULT_PALETTE
@@ -975,12 +962,14 @@ def generate_outliers_chart(df, stage_col, target_col, value_col, selected_palet
         df_clean[value_col] = pd.to_numeric(df_clean[value_col], errors='coerce').fillna(0)
         value_col_internal = value_col
 
-    # =============================================================================
-    # STREAMLINED ANOMALY AUDIT ENGINE (GRAPH TRAVERSAL FULLY REMOVED)
-    # =============================================================================
+    # Validate that the passed aggregation function is supported by pandas
+    if agg_func not in ["sum", "max", "mean"]:
+        agg_func = "sum"
+
     # Directly assemble composite path sequences using a clean high-performance groupby pass
     df_clean['COMPOSITE_PATH'] = df_clean[stage_col] + " ➔ " + df_clean[target_col]
-    df_analysis = df_clean.groupby('COMPOSITE_PATH')[value_col_internal].sum().reset_index()
+
+    df_analysis = df_clean.groupby('COMPOSITE_PATH')[value_col_internal].agg(agg_func).reset_index()
     df_analysis.columns = ['ENTITY_ID', 'VALUE_METRIC']
 
     df_analysis = df_analysis[df_analysis['VALUE_METRIC'] > 0].reset_index(drop=True)
@@ -1016,9 +1005,13 @@ def generate_outliers_chart(df, stage_col, target_col, value_col, selected_palet
     # Construct safe string template mask to decouple nested brace structures
     outliers_hovertemplate = (
         "<b>Sub-Route/Batch:</b> %{y}<br>"
-        "<b>Volume:</b> %{x" + val_format + "}<br>"
+        "<b>Value:</b> %{x" + val_format + "}<br>"
         "<b>Status:</b> %{customdata}<extra></extra>"
     )
+
+    # FIXED: Read from computed ENTITY_ID to prevent string conversion/NaN crashes
+    longest_outlier_label = df_analysis['ENTITY_ID'].apply(lambda x: len(str(x))).max() if not df_analysis.empty else 100
+    dynamic_outlier_margin = max(150, longest_outlier_label * 7.0)
 
     # Render a high-fidelity visual audit report layout
     fig = go.Figure(go.Bar(
@@ -1027,19 +1020,26 @@ def generate_outliers_chart(df, stage_col, target_col, value_col, selected_palet
         orientation='h',
         marker=dict(color=colors, line=dict(color='#FFFFFF', width=0.5)),
         hovertemplate=outliers_hovertemplate,
-        customdata=["Anomaly (Outlier)" if out else "Normal Transaction" for out in df_analysis['IS_OUTLIER']]
+        # UPDATED: More universal status labels fit for both logs and finance
+        customdata=["Anomaly (Outlier)" if out else "Normal Route" for out in df_analysis['IS_OUTLIER']]
     ))
 
-    final_width = width_px if width_px is not None else DEFAULT_WIDTH
-    final_autosize = DEFAULT_AUTOSIZE if width_px is None else False
+    # NEW: Automatically switch the X-axis label context based on the active agg_func parameter
+    if agg_func == "max":
+        xaxis_label = f"MAX SINGLE-RUN VOLUME ({value_col.upper()})"
+    elif agg_func == "mean":
+        xaxis_label = f"AVERAGE VOLUME ({value_col.upper()})"
+    else:
+        xaxis_label = f"TOTAL ACCUMULATED VOLUME ({value_col.upper()})"
 
     # Apply corporate dashboard presentation configuration using the British dot standard
     fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         plot_bgcolor="white", paper_bgcolor="white",
-        height=height_px, width=final_width, autosize=final_autosize,
-        margin=dict(l=250, r=40, t=60, b=60),
-        xaxis=dict(title=f"AGGREGATED VOLUME ({value_col.upper()})",
+        height=height_px, width=width_px, autosize=False,
+        # UPDATED: Injected dynamic left margin calculation to prevent text truncation
+        margin=dict(l=int(dynamic_outlier_margin), r=40, t=60, b=60),
+        xaxis=dict(title=xaxis_label, # UPDATED: Using dynamic context label here
                    showgrid=True,
                    gridcolor='#E5E5E5',
                    linecolor='#000000',
@@ -1049,7 +1049,6 @@ def generate_outliers_chart(df, stage_col, target_col, value_col, selected_palet
                    showgrid=False,
                    linecolor='#000000',
                    type='category'),
-        # FIXED: Synced hover format masks with thin spacing delimiters standard
         separators=" ."
     )
 
@@ -1086,7 +1085,7 @@ if uploaded_file is not None:
     if show_raw_data:
         st.subheader("Uploaded Data View")
         st.dataframe(opt_table,
-                     use_container_width=True,
+                     use_container_width=False,
                      column_config={
                          col: st.column_config.NumberColumn(format="%d")
                          for col in found_numeric
@@ -1197,7 +1196,7 @@ if uploaded_file is not None:
                 value=st.session_state["global_chart_title"],
                 key="local_title_text_parcats",
                 on_change=sync_global_session_variable,
-                args=("local_title_text_parcats", "global_chart_title") # Передаем локальный и глобальный ключ
+                args=("local_title_text_parcats", "global_chart_title")
             )
         with title_col2:
             align_options = ["Left", "Center", "Right"]
@@ -1286,17 +1285,11 @@ if uploaded_file is not None:
                 height_px=chart_height_px
             )
 
-            # Execution Layer: Handle view rendering boundaries and edge exceptions
-            if not selected_stages_parcats:
-                st.warning("Please select at least 1 starting stage column.")
-            elif fig_parcats is None or not fig_parcats.data:
-                st.info("No active data found for the current column selections.")
-            else:
-                st.plotly_chart(
-                    fig_parcats,
-                    use_container_width=True,
-                    config={'responsive': True, 'displaylogo': False}
-                )
+            render_with_scroll(
+                fig=fig_parcats,
+                width=chart_width_px,
+                height=chart_height_px
+            )
 
     # =============================================================================
     # TAB 2: PIPELINE ROUTE CONVERSION (ROUTE-SPECIFIC FUNNEL ANALYSIS)
@@ -1446,21 +1439,15 @@ if uploaded_file is not None:
                 chart_title=fun_chart_title,
                 title_size=fun_title_size,
                 title_x=title_x_pos_f,
-                width_px=1400,
-                height_px=650
+                width_px=chart_width_px,
+                height_px=chart_height_px
             )
 
-            # Execution Layer: Handle view rendering boundaries and edge exceptions
-            if not selected_stages_fun:
-                st.warning("Please select at least 1 starting stage column.")
-            elif fig_fun is None or not fig_fun.data:
-                st.info("No active pipeline connection found between the selected start and destination points.")
-            else:
-                st.plotly_chart(
-                    fig_fun,
-                    use_container_width=True,
-                    config={'responsive': True, 'displaylogo': False}
-                )
+            render_with_scroll(
+                fig=fig_fun,
+                width=chart_width_px,
+                height=chart_height_px
+            )
 
     # =============================================================================
     # TAB 3: VOLUMETRIC ANALYSIS: STRUCTURAL BREAKDOWN (STACKED BAR ARCHITECTURE)
@@ -1585,18 +1572,11 @@ if uploaded_file is not None:
                 height_px=chart_height_px
             )
 
-            # Execution Layer: Handle view rendering boundaries and edge exceptions
-            if not selected_stages_bar:
-                st.warning("Please select at least 1 starting stage column.")
-            elif fig_bar is None or not fig_bar.data:
-                st.info("No active data found for the current selections.")
-            else:
-                st.plotly_chart(
-                    fig_bar,
-                    # FIXED: Activated adaptive horizontal container expansion
-                    use_container_width=True,
-                    config={'responsive': True, 'displaylogo': False}
-                )
+            render_with_scroll(
+                fig=fig_bar,
+                width=chart_width_px,
+                height=chart_height_px
+            )
 
     # =============================================================================
     # TAB 4: COMPONENT SHARE MAP (BENTO TREEMAP ARCHITECTURE)
@@ -1692,15 +1672,10 @@ if uploaded_file is not None:
             height_px=chart_height_px
         )
 
-        # Execution Layer: Handle view rendering boundaries and edge exceptions
-        if not fig_bento.data:
-            st.info("No active data found for the current column selections.")
-        else:
-            st.plotly_chart(
-                fig_bento,
-                # Activated container stretching to preserve bento tile text scaling
-                use_container_width=True,
-                config={'responsive': True, 'displaylogo': False}
+        render_with_scroll(
+            fig=fig_bento,
+            width=chart_width_px,
+            height=chart_height_px
         )
 
     # =============================================================================
@@ -1822,29 +1797,20 @@ if uploaded_file is not None:
             show_annot=show_annotations
         )
 
-        # Execution Layer: Handle view rendering boundaries and edge exceptions
-        if not fig_heatmap.data:
-            st.info("No active data found for the current grid selections.")
-        else:
-
-            left_pad, center_grid, right_pad = st.columns([1.5, 7, 1.5])
-
-            with center_grid:
-                st.plotly_chart(
-                    fig_heatmap,
-                    # FIXED: Enforce container scaling limits to preserve strict square cells layout ratio
-                    use_container_width=False,
-                    config={'responsive': True, 'displaylogo': False}
-                )
+        render_with_scroll(
+            fig=fig_heatmap,
+            width=chart_width_px,
+            height=chart_height_px
+        )
 
     # =============================================================================
-    # TAB 6: ANOMALY & RISK AUDIT (ROUTE TRANSACTIONS OUTLIER ANALYSIS)
+    # TAB 6: ANOMALY & RISK AUDIT (ROUTE TRANSACTIONS & LOG OUTLIER ANALYSIS)
     # =============================================================================
     with tab_outliers:
-        st.subheader("Route Transaction Outlier Analysis")
+        st.subheader("Process Route Outlier & Anomaly Analysis")
         st.write(
             "**Best for:** Specific route auditing. Define an end-to-end corridor to automatically compute "
-            "statistical thresholds (IQR method) and isolate abnormal transaction bursts within sub-routes."
+            "statistical thresholds (IQR method) and isolate abnormal execution spikes, infinite loops, or transaction bursts."
         )
 
         # Control Panel Section 1: Visual Layout Typography & Header Options
@@ -1884,8 +1850,8 @@ if uploaded_file is not None:
             )
 
 
-        # Control Panel Section 2: Core Axis Mapping Configuration
-        out_ctrl_col1, out_ctrl_col2, out_ctrl_col3 = st.columns(3)
+        # Control Panel Section 2: Core Axis Mapping & Aggregation Configuration
+        out_ctrl_col1, out_ctrl_col2, out_ctrl_col3, out_ctrl_col4 = st.columns(4) # Split into 4 columns to fit aggregation selector
         with out_ctrl_col1:
             stage_col_out = st.selectbox(
                 "Source (From):",
@@ -1911,13 +1877,24 @@ if uploaded_file is not None:
             default_idx_out = numeric_cols.index(current_global_val) if current_global_val in numeric_cols else 0
 
             value_col_out = st.selectbox(
-                "Weight/Volume:",
+                "Weight/Volume/Metric:",
                 options=numeric_cols,
                 index=default_idx_out,          # Preserves the user choice globally across tabs
                 key="local_val_outliers",       # Unique state tracking key for this selector element
                 on_change=sync_global_session_variable,
-                args=("local_val_outliers", "global_title_align")    # Synchronizes the layout selection seamlessly with trailing comma
+                args=("local_val_outliers", "global_measure_col")    # FIXED: Bound to global_measure_col instead of alignment
             )
+
+        with out_ctrl_col4:
+            # NEW: Aggregation method dropdown for flexible analytical view scoping
+            agg_options_out = {"Total Accumulated (Sum)": "sum", "Max Single-Run (Max)": "max", "Average (Mean)": "mean"}
+            selected_agg_label_out = st.selectbox(
+                "Aggregation Method:",
+                options=list(agg_options_out.keys()),
+                index=0,
+                key="out_aggregation_func"
+            )
+            agg_func_out = agg_options_out[selected_agg_label_out]
 
         st.markdown("Select Specific Route Path for Statistical Audit:")
         filter_col1, filter_col2 = st.columns(2)
@@ -1938,6 +1915,7 @@ if uploaded_file is not None:
             stage_col=stage_col_out,
             target_col=target_col_out,
             value_col=value_col_out,
+            agg_func=agg_func_out, # UPDATED: Dynamic aggregation method parameter pass
             selected_palette=chosen_colors,
             unit_divider=unit_divider,
             force_shuffle=use_shuffle_out,
@@ -1947,13 +1925,9 @@ if uploaded_file is not None:
             width_px=chart_width_px,
             height_px=chart_height_px
         )
-        # Execution Layer: Handle view rendering boundaries and edge exceptions
-        if fig_outliers is None or not fig_outliers.data:
-            st.info("No active pipeline connection found between the selected audit start and destination points.")
-        else:
-            st.plotly_chart(
-                fig_outliers,
-                # FIXED: Activated responsive layout stretching to safeguard long compound path strings
-                use_container_width=True,
-                config={'responsive': True, 'displaylogo': False}
+
+        render_with_scroll(
+            fig=fig_outliers,
+            width=chart_width_px,
+            height=chart_height_px
         )

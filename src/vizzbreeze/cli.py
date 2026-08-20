@@ -16,7 +16,11 @@ def main():
         
     try:
         # Автоматически вызываем 'streamlit run' из-под капота
-        subprocess.run(["streamlit", "run", str(app_path)], check=True)
+        subprocess.run(["streamlit",
+                        "run",
+                        str(app_path),
+                        "--server.maxUploadSize=2000"], # Pass argument to extend Streamlit max upload limit to 2000 MB
+                       check=True)
     except KeyboardInterrupt:
         print("\nDashboard execution terminated by user.")
     except Exception as e:

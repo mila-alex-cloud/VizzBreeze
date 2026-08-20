@@ -4,14 +4,14 @@
 
 A lightweight, high-performance transactional web-dashboard designed for advanced data flow analytics, multi-stage routing visualization, and statistical risk audit，and AI Agent trace visualization. Built natively on top of Streamlit, Pandas, and Plotly.
 
-⚠️ Note: The Streamlit max-size override and AI chart templates are rolling out tonight in version 1.0.16! Stay tuned
-
 ## Key Features
 
 - **Flat Transaction Processing Engine**: Optimized for fast processing of un-aggregated logs (e.g., Client ➔ Fund ➔ Asset).
 - **Global Session Synchronization**: Seamlessly locks metric column selections, typography sizes, and alignments across all workspace views.
 - **Auto-Scroll Suppression**: Enhanced layout architecture prevents viewport jumps during widget updates and data updates.
 - **Advanced Graph Matrix Analytics**: Includes high-fidelity stacked charts, multi-dimensional Parcats layouts, Density Matrices, and automated IQR risk audit profiling tools.
+- **AI Agent Trace & Observability**: Native templates designed to map LLM chain-of-thought routing, monitor token consumption footprints, and catch execution latency anomalies.
+
 
 ## Build With
 1  - [Plotly](https://plotly.com) - Core interactive charting engine.
@@ -67,12 +67,12 @@ chosen_colors = vb.COLOR_PALETTES["Warm Amber"]
 
 ## Core Analytical Tabs
 
-1. **Flows**: Explore multi-stage multi-dimensional category paths with thin, light axis labels and custom high-contrast hover tooltips.
+1. **Flows**: Explore multi-stage category paths (e.g., LLM chain-of-thought: Intent ➔ Agent ➔ Tool) with thin, light axis labels and custom high-contrast hover tooltips.
 2. **Funnel**: Track progressive conversion drops along specific workflow layers.
 3. **Structural Breakdown**: Classic stacked column bar charts configured with responsive axis titles that update on the fly based on active filters.
-4. **Bento**: An asymmetrical modular tile framework designed to compress complex multi-level dimensions into a clean, prioritized grid dashboard.
+4. **Bento**: An asymmetrical modular tile framework designed to compress complex multi-level dimensions (like Token Consumption Footprints) into a clean, prioritized grid dashboard.
 5. **Density Matrix**: High-density dashboard to scan cluster intersections instantly.
-5. **Anomaly & Risk Audit**: Automated statistical anomaly profiling that detects process outliers without freezing the browser engine.
+5. **Anomaly & Risk Audit**: Automated statistical anomaly profiling that detects execution latency spikes and infinite loop outliers without freezing the browser engine.
 
 ### Core Functions API Reference & Parameter Mapping
 
@@ -82,153 +82,154 @@ All visualization engines are fully modular, accept un-aggregated raw `pandas.Da
 
 ### 1. Flows
 ```python
-fig = vb.generate_parcats(
-    df=df,                          # pandas.DataFrame: Source transaction logs (un-aggregated)
-    stage_nodes=['col1', 'col2'],   # list: Ordered column names defining the routing stages
-    target_node='col3',             # str: The terminal endpoint column name
-    value_col='amount',             # str: Volume metric column name (or "Number of rows (Sample size)")
-    selected_palette=chosen_colors, # list/str: List of HEX codes or a built-in palette name string
-    unit_divider=1.0,               # float: Optional division scaling factor (e.g., 1000 for Thousands)
-    force_shuffle=False,            # bool/int: Seed integer to randomize color distribution maps
-    chart_title="Flow Canvas",      # str: Custom graph header text
-    title_size=20,                  # int: Font size of the chart title
-    width_px=1050,                  # int: Holster canvas width (1050 fits Jupyter viewports perfectly)
-    height_px=500,                  # int: Holster canvas height
-    title_x=0.5                     # float: Header Alighnment
+flow_fig = vb.generate_parcats(
+    df=df,
+    stage_nodes=['user_intent', 'active_agent', 'tool_called'],
+    target_node='execution_status',
+    value_col='tokens_used',  # Flows will scale by token consumption!
+    chart_title="AI Agent Chain of Thought & Token Distribution",
+    selected_palette=chosen_colors,
+    title_size=20,
+    width_px=1600,
+    height_px=500,
+    title_x = 0.5
 )
-fig.update_layout(
-    margin=dict(l=100, r=100, t=100, b=50)
-    )
-fig.show()
-```
 
-<img width="837" height="416" alt="image" src="https://github.com/user-attachments/assets/fa4bc19d-4629-4d7e-a733-afc4dfd30ac8" />
+flow_fig.show()
+```
+<img width="867" height="266" alt="image" src="https://github.com/user-attachments/assets/71925812-abc1-4d78-a68f-9e497a6dcf3f" />
 
 ### 2. Funnel
 ```python
 fig = vb.generate_funnel_chart(
     df=df,
-    stage_nodes=['col1', 'col2'],   # list: Sequence of progressive funnel workflow steps
-    target_node='col3',             # str: Terminal checkpoint layer name
-    value_col='amount',             # str: Volume metric target column
-    selected_route_dict=route_dict, # dict: Active routing coordinate filters (e.g., {'col1': 'Client_1'})
-    selected_palette=chosen_colors,
+    stage_nodes=['user_intent', 'active_agent', 'tool_called'],   
+    target_node='execution_status',                               
+    value_col='tokens_used',                                      
+    
+    # ИСПРАВЛЕНИЕ: Передаем параметры фильтрации из таблицы логов
+    selected_route_dict={
+        'user_intent':'Tech Support', 'active_agent':'Router_Agent', 'tool_called':'Knowledge_Base_Lookup'  # Показываем путь только для конкретного ID лога
+
+    },                                       
+    selected_palette=chosen_colors,            
     unit_divider=1.0,
-    force_shuffle=False,
-    chart_title="Pipeline Drops",
+    force_shuffle=True,
+    chart_title="AI Agent Chain of Thought & Token Distribution", 
     width_px=1050,
     height_px=500,
-    title_x=0.5                     
+    title_x=0.5
 )
-fig.update_layout(
-    margin=dict(l=250, r=20, t=100, b=50)
-    )
-fig.show()
-```
 
-<img width="934" height="437" alt="image" src="https://github.com/user-attachments/assets/517a4d97-6eeb-44cd-8d95-b583cc22bdd6" />
+fig.update_layout(
+    margin=dict(l=350, r=20, t=100, b=50)
+)
+```
+<img width="575" height="249" alt="image" src="https://github.com/user-attachments/assets/78f14331-6bdd-4ea4-96b7-8953fd52edd7" />
 
 ### 3. Structural Breakdown
 ```python
+stage_nodes=['user_intent']
+target_node='execution_status'
+value_col='tokens_used'
+
 fig = vb.generate_stacked_bar_chart(
     df=df,
-    stage_nodes=['col1', 'col2'],   # list: Categories to aggregate and display on the horizontal X-axis
-    target_node='col3',             # str: Legend segment categorical target breakdown
-    value_col='amount',             # str: Numeric target volume metric
+    stage_nodes=stage_nodes,
+    target_node=target_node,           
+    value_col=value_col,            
     selected_palette=chosen_colors,
     unit_divider=1.0,
-    force_shuffle=False,
-    chart_title="Composition",
-    width_px=1050,
+    force_shuffle=True,
+    chart_title="Systemic Error Distribution Across Active Agents",
+    width_px=1600,
     height_px=500,
-    title_x=0.5 
+    title_x = 0.5
 )
 fig.update_layout(
-    margin=dict(l=100, r=20, t=50, b=50) 
+    margin=dict(l=100, r=20, t=50, b=120)
 )
+
 fig.update_layout(
     yaxis=dict(
-        title="", 
+        title=""
     )
+)
+
 fig.show()
 ```
-
-<img width="923" height="427" alt="image" src="https://github.com/user-attachments/assets/a9ea4ef1-ba04-453f-b105-2693a228f240" />
+<img width="869" height="278" alt="image" src="https://github.com/user-attachments/assets/3e6dd8d4-8a50-464f-99f5-151eeb7c51dd" />
 
 ### 4. Bento
 ```python
 fig = vb.generate_bento_treemap(
     df=df,
-    id_col='target_dimension',      # str: Unique column name to rank and partition into tiles
-    value_col='amount',             # str: Target numeric metric column name
+    id_col='user_intent',      
+    value_col=value_col,           
     selected_palette=chosen_colors,
     unit_divider=1.0,
-    force_shuffle=False,
-    chart_title="Bento Allocation Top-15", # Automatically truncates grid layout to Top 15 nodes
+    force_shuffle=True,
+    chart_title="Token Consumption Footprint by Intent Layer",
     width_px=1050,
     height_px=500,
-    title_x=0.5 
+    title_x = 0.5
 )
 fig.update_layout(
     margin=dict(l=50, r=20, t=50, b=50)
     )
 fig.show()
 ```
-
-<img width="909" height="405" alt="image" src="https://github.com/user-attachments/assets/1fc64f9e-ef9b-473d-914a-6d295254cf4e" />
+<img width="562" height="257" alt="image" src="https://github.com/user-attachments/assets/4a147f48-3e30-47ea-97ab-8956f4f2c13d" />
 
 ### 5. Density Matrix
 ```python
 fig = vb.generate_heatmap(
     df=df,
-    x_col='category_x',             # str: Categorical split column for horizontal partitions (X-Axis)
-    y_col='category_y',             # str: Categorical split column for vertical partitions (Y-Axis)
-    value_col='amount',             # str: Numeric target volume or "Number of rows (Sample size)"
+    x_col='user_intent',
+    y_col='execution_status',
+    value_col='tokens_used',
     selected_palette=chosen_colors,
-    unit_divider=1.0,
-    force_shuffle=False,
-    chart_title="Density Matrix",
-    show_annot=True,                # bool: Inject clean, non-zero numeric labels inside active cells
+    chart_title="AI Agent Token Consumption Heatmap by Execution Status", 
+    show_annot=True,
     width_px=1050,
     height_px=500,
-    title_x=0.5 
+    title_x=0.5
 )
+
+fig.update_xaxes(title_text="USER INTENT LAYER")
+fig.update_yaxes(title_text="EXECUTION STATUS")
+
 fig.update_layout(
-    margin=dict(l=100, r=20, t=50, b=50)
-    )
+    margin=dict(l=150, r=20, t=50, b=50)
+)
 fig.show()
 ```
 
-<img width="939" height="436" alt="image" src="https://github.com/user-attachments/assets/395a247b-788b-4d81-a9dd-5d9b93546b1c" />
+<img width="582" height="280" alt="image" src="https://github.com/user-attachments/assets/d46b91f3-b557-4fd1-84f6-13d5528568fe" />
 
 ### 6. Anomaly & Risk Audit
 ```python
-fig = vb.generate_outliers_chart(
+anomaly_fig = vb.generate_outliers_chart(
     df=df,
-    stage_col='origin_node',         # str: Operational source checkpoint step
-    target_col='destination_node',   # str: Operational destination checkpoint step
-    value_col='amount',              # str: Numeric target weight column to compute strict IQR bounds
+    stage_col='active_agent',
+    target_col='tool_called',
+    value_col='execution_time_sec',
+    chart_title="AI Execution Latency Anomaly Profile (IQR Bounds)",
     selected_palette=chosen_colors,
-    unit_divider=1.0,
-    force_shuffle=False,
-    chart_title="Statistical Anomaly Profile", # Automatically plots a dashed line at Q3 + 1.5*IQR upper boundary
     width_px=1050,
     height_px=500,
-    title_x=0.5 
+    title_x=0.5
 )
-fig.update_layout(
-    margin=dict(l=170, r=20, t=50, b=70)
-    )
-fig.update_layout(
-    yaxis=dict(
-        title="", 
-    )
+
+anomaly_fig.update_xaxes(title_text="TOTAL ACCUMULATED LATENCY (SEC)")
+
+anomaly_fig.update_layout(
+    margin=dict(l=310, r=20, t=50, b=50)
 )
-fig.show()
+anomaly_fig.show()
 ```
 
-<img width="934" height="442" alt="image" src="https://github.com/user-attachments/assets/50398b02-b697-44d8-a55a-5c0c2215f0b3" />
-
+<img width="580" height="280" alt="image" src="https://github.com/user-attachments/assets/f6568901-5fee-4c2b-aa25-d5350b5dab8c" />
 
 ## Requirements
 
