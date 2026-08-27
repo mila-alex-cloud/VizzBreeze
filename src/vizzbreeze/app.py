@@ -22,34 +22,93 @@ class StreamlitNoiseFilter:
         if self.original_stream:
             self.original_stream.flush()
 
-# Перехватываем стандартный поток вывода ошибок до импорта Streamlit
+
+# Intercept the standard error stream before Streamlit is imported
 if sys.stderr:
     sys.stderr = StreamlitNoiseFilter(sys.stderr)
 
-# Теперь импорт Streamlit пройдет абсолютно бесшумно в Jupyter / Colab среде
+# Now the Streamlit import will execute completely silently in Jupyter / Colab environments
 import streamlit as st
 from streamlit.runtime.scriptrunner import get_script_run_ctx
+
 
 def render_with_scroll(fig, width, height):
     import streamlit as st
     from streamlit.runtime.scriptrunner import get_script_run_ctx
 
-    # Check if the execution context is within an active Streamlit server instance
+    # Calculate physical pixels from your centimeter scale
+    final_width = width if width is not None else 1800
+    fig.update_layout(width=final_width, height=height, autosize=False)
+
     if get_script_run_ctx() is not None:
-        # FIX: Explicitly set width to None to erase fixed pixel constraints (e.g., 1400px) from the fig layout.
-        # This allows Plotly to release its rigid boundaries and inherit native fluid responsiveness.
-        fig.update_layout(width=None, height=height, autosize=True)
+        # ULTRA-DYNAMIC SCROLL WITH SIDEBAR COLLAPSE SUPPORT
+        st.markdown(f"""
+        <div style="overflow-x: auto; overflow-y: hidden; width: 100%; display: block; padding-bottom: 15px;">
+        <style>
+        .stPlotlyChart > div {{
+            /* Set the base fixed width calculated from your cm scale */
+            width: {final_width}px !important;      
+            min-width: {final_width}px !important;  
+            
+            /* CRITICAL FIX: If the calculated chart width is smaller than the 
+               actual screen content area (e.g., when the sidebar is collapsed), 
+               the chart will automatically and smoothly stretch to 100% of the browser window! */
+            max-width: 100% !important; 
+        }}
+        </style>
+        """, unsafe_allow_html=True)
 
-        # Deploy with the container width flag enabled to stretch the chart to 100% of the active viewport browser tab
-        st.plotly_chart(fig, use_container_width=True)
+def render_with_scroll(fig, width, height):
+    import streamlit as st
+    from streamlit.runtime.scriptrunner import get_script_run_ctx
+
+    # 1. Calculate precise physical pixels based on your centimeters formula
+    final_width = width if width is not None else 1800
+    fig.update_layout(width=final_width, height=height, autosize=False) # Disables autosizing
+
+    # 2. Check the execution environment: Cloud (Streamlit) or Notebook (Jupyter / Colab)
+    if get_script_run_ctx() is not None:
+        # --- MINIMALIST SOLUTION FOR STREAMLIT (WITHOUT BUTTONS) ---
+
+        # Get the unique memory address of the figure object to clear the cache
+        obj_id = id(fig)
+
+        # Open the scrollable container and hard-lock the width of the chart
+        st.markdown(f"""
+        <div style="overflow-x: auto; overflow-y: hidden; width: 100%; display: block; padding-bottom: 15px;">
+        <style>
+        .stPlotlyChart > div {{
+            width: {final_width}px !important;      /* Hard-locks the container width */
+            min-width: {final_width}px !important;  /* Prevents it from shrinking or stretching */
+            max-width: 100% !important;             /* Allows the chart to expand when the sidebar is collapsed */
+        }}
+        </style>
+        """, unsafe_allow_html=True)
+
+        # Render the native chart with fluid container width disabled.
+        # The key parameter ensures that Plotly updates the canvas tracking the slider.
+        st.plotly_chart(
+            fig,
+            use_container_width=False,
+            key=f"chart_scroll_node_direct_{obj_id}_{final_width}"
+        )
+        st.markdown("</div>", unsafe_allow_html=True) # Closes the scroll container
+
     else:
-        # Fall back to a fixed or baseline layout size when rendering inside static Jupyter Notebook / Google Colab environments
-        final_width = width if width is not None else 1050
-        fig.update_layout(width=final_width, height=height, autosize=False)
-        st.plotly_chart(fig, use_container_width=False)
+        # --- UNIVERSAL BLOCK FOR JUPYTER / GOOGLE COLAB ---
+        from IPython.display import display, HTML
+        import plotly.io as pio
+
+        chart_html = pio.to_html(fig, include_plotlyjs='cdn', full_html=False)
+        scrollable_wrapper = f"""
+        <div style="width: 100%; overflow-x: auto; overflow-y: hidden; white-space: nowrap; border: 1px solid #e6e6e6; padding: 5px;">
+            {chart_html}
+        </div>
+        """
+        display(HTML(scrollable_wrapper))
 
 
-# Инициализируем конфигурацию страницы ТОЛЬКО внутри активной сессии сервера Streamlit
+# Initialize the page configuration ONLY within an active Streamlit server session
 if get_script_run_ctx() is not None:
     st.set_page_config(
         layout="wide",
@@ -1119,7 +1178,7 @@ if uploaded_file is not None:
     # Capture target printable dimensions directly via metric scale sliders
     chart_width_cm = st.sidebar.slider(
         "Width (cm):",
-        min_value=15, max_value=50, value=30, step=1,
+        min_value=15, max_value=100, value=30, step=1,
         key="width_cm_slider"
     )
     chart_height_cm = st.sidebar.slider(
