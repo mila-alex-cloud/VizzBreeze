@@ -26,18 +26,6 @@ VizzBreeze functions process un-aggregated raw DataFrames and return native Plot
 ```python
 import vizzbreeze as vb
 import pandas as pd
-
-# Load raw transaction logs
-df = pd.read_csv("transactions.csv")
-
-# Generate advanced Parcats flow directly in your notebook
-fig = vb.generate_parcats(
-    df=df, 
-    stage_nodes=['client', 'fund'], 
-    target_node='asset', 
-    value_col='amount'
-)
-fig.show()
 ```
 
 #### 2. Standalone Web Control Room Execution
@@ -62,7 +50,7 @@ import vizzbreeze as vb
 print(vb.COLOR_PALETTES.keys())
 
 # Extract a specific synchronized list of colors
-chosen_colors = vb.COLOR_PALETTES["Warm Amber"]
+chosen_colors = vb.COLOR_PALETTES["Consulting Premium"]
 ```
 
 ## Core Analytical Tabs
@@ -98,8 +86,8 @@ flow_fig = vb.generate_parcats(
 flow_fig.show()
 ```
 
+<img width="1350" height="500" alt="newplot" src="https://github.com/user-attachments/assets/0ac9dd2f-a09c-4127-bb31-4eed977385cd" />
 
-<img width="867" height="266" alt="image" src="https://github.com/user-attachments/assets/71925812-abc1-4d78-a68f-9e497a6dcf3f" />
 
 ### 2. Funnel
 ```python
@@ -128,8 +116,8 @@ fig.update_layout(
 )
 ```
 
+<img width="1050" height="500" alt="newplot (1)" src="https://github.com/user-attachments/assets/e611cc82-5d4c-4c91-85ce-29890f83aec5" />
 
-<img width="575" height="249" alt="image" src="https://github.com/user-attachments/assets/78f14331-6bdd-4ea4-96b7-8953fd52edd7" />
 
 ### 3. Structural Breakdown
 ```python
@@ -163,8 +151,8 @@ fig.update_layout(
 fig.show()
 ```
 
+<img width="1100" height="500" alt="newplot (2)" src="https://github.com/user-attachments/assets/2a499747-46b8-481a-8982-68a5fd57f352" />
 
-<img width="869" height="278" alt="image" src="https://github.com/user-attachments/assets/3e6dd8d4-8a50-464f-99f5-151eeb7c51dd" />
 
 ### 4. Bento
 ```python
@@ -186,8 +174,8 @@ fig.update_layout(
 fig.show()
 ```
 
+<img width="1050" height="500" alt="newplot (3)" src="https://github.com/user-attachments/assets/6b621d64-f52e-4b99-bda1-c14ddb081544" />
 
-<img width="562" height="257" alt="image" src="https://github.com/user-attachments/assets/4a147f48-3e30-47ea-97ab-8956f4f2c13d" />
 
 ### 5. Heatmap
 ```python
@@ -213,8 +201,8 @@ fig.update_layout(
 fig.show()
 ```
 
+<img width="700" height="500" alt="newplot (4)" src="https://github.com/user-attachments/assets/b37dac6a-2973-427a-8183-629660ef5f02" />
 
-<img width="582" height="280" alt="image" src="https://github.com/user-attachments/assets/d46b91f3-b557-4fd1-84f6-13d5528568fe" />
 
 ### 6. Anomaly & Risk Audit
 ```python
@@ -239,7 +227,8 @@ anomaly_fig.update_layout(
 anomaly_fig.show()
 ```
 
-<img width="580" height="280" alt="image" src="https://github.com/user-attachments/assets/12442eb0-d977-4894-9174-b9be0ba44fda" />
+<img width="1050" height="500" alt="newplot (5)" src="https://github.com/user-attachments/assets/08835580-94cb-4de1-98bf-16f906d0216e" />
+
 
 ## Requirements
 
