@@ -1,46 +1,68 @@
 import numpy as np
 import pandas as pd
-import streamlit as st
 import plotly.graph_objects as go
 import random
-import logging
+import sys
+
+# =============================================================================
+# HARD SYS.STDERR FILTER: MUTING STREAMLIT BEFORE ANY IMPORTS EXECUTE
+# =============================================================================
+class StreamlitNoiseFilter:
+    def __init__(self, original_stream):
+        self.original_stream = original_stream
+
+    def write(self, message):
+        # Жестко отсекаем строки, содержащие внутренний лог-мусор Streamlit
+        if "missing ScriptRunContext" in message or "streamlit run" in message or "Session state does not function" in message:
+            return
+        if self.original_stream:
+            self.original_stream.write(message)
+
+    def flush(self):
+        if self.original_stream:
+            self.original_stream.flush()
+
+# Перехватываем стандартный поток вывода ошибок до импорта Streamlit
+if sys.stderr:
+    sys.stderr = StreamlitNoiseFilter(sys.stderr)
+
+# Теперь импорт Streamlit пройдет абсолютно бесшумно в Jupyter / Colab среде
+import streamlit as st
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 def render_with_scroll(fig, width, height):
-
     import streamlit as st
-    fig.update_layout(width=width, height=height, autosize=False)
+    from streamlit.runtime.scriptrunner import get_script_run_ctx
 
-    st.markdown(f"""
-        <div style="overflow-x: auto; overflow-y: hidden; width: 100%; display: block;">
-            <style>
+    # Check if the execution context is within an active Streamlit server instance
+    if get_script_run_ctx() is not None:
+        # FIX: Explicitly set width to None to erase fixed pixel constraints (e.g., 1400px) from the fig layout.
+        # This allows Plotly to release its rigid boundaries and inherit native fluid responsiveness.
+        fig.update_layout(width=None, height=height, autosize=True)
 
-                .stPlotlyChart > div {{
-                    width: {width}px !important;
-                    min-width: {width}px !important;
-                }}
-            </style>
-    """, unsafe_allow_html=True)
-    st.plotly_chart(fig, use_container_width=False)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# FORCIBLY SILENCE INTERNAL STREAMLIT LOGGING OUTSIDE ACTIVE SERVER SESSIONS
-if get_script_run_ctx() is None:
-    # Completely suppress Streamlit background warnings and context noise in Jupyter
-    logging.getLogger("streamlit").setLevel(logging.ERROR)
+        # Deploy with the container width flag enabled to stretch the chart to 100% of the active viewport browser tab
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        # Fall back to a fixed or baseline layout size when rendering inside static Jupyter Notebook / Google Colab environments
+        final_width = width if width is not None else 1050
+        fig.update_layout(width=final_width, height=height, autosize=False)
+        st.plotly_chart(fig, use_container_width=False)
 
 
-st.set_page_config(
-    layout="wide",
-    page_title="VizzBreeze | Data Visualization App",
-    page_icon="",
-    initial_sidebar_state="expanded"
-)
-# --- BRANDING IN SIDEBAR ---
-st.sidebar.title("VizzBreeze")
-st.sidebar.markdown("*From Chaos to Clarity*")
-st.sidebar.markdown("Developed by: [Mila Alex, CFA](https://www.linkedin.com/in/mila-alex-cfa/)")
-st.sidebar.markdown("---")
+# Инициализируем конфигурацию страницы ТОЛЬКО внутри активной сессии сервера Streamlit
+if get_script_run_ctx() is not None:
+    st.set_page_config(
+        layout="wide",
+        page_title="VizzBreeze | Data Visualization App",
+        page_icon="",
+        initial_sidebar_state="expanded"
+    )
+    # --- BRANDING IN SIDEBAR ---
+    st.sidebar.title("VizzBreeze")
+    st.sidebar.markdown("*From Chaos to Clarity*")
+    st.sidebar.markdown("Developed by: [Mila Alex, CFA](https://linkedin.com)")
+    st.sidebar.markdown("---")
+
 
 # GLOBAL AUTOSIZING & STYLING CONFIGURATION FOR ALL PACKAGES
 DEFAULT_PALETTE = "Warm Amber"  # Set your fallback brand color scheme here
@@ -426,8 +448,8 @@ def generate_parcats(df, stage_nodes, target_node, value_col, width_px, height_p
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         plot_bgcolor="white", paper_bgcolor="white",
         height=height_px,
-        width=width_px,
-        autosize=False, #final_autosize,
+        width=width_px if width_px else None,
+        autosize=True if not width_px else False,
         annotations=chart_annotations,
 
         # FIXED VERTICAL GAP: Increased t (top margin) to 100 to push the chart down and restore the header spacing
@@ -545,8 +567,8 @@ def generate_funnel_chart(df, stage_nodes, target_node, value_col, selected_rout
         plot_bgcolor="white",
         paper_bgcolor="white",
         height=height_px,
-        width=width_px,
-        autosize=False, #final_autosize,
+        width=width_px if width_px else None, # Если None, то график будет растягиваться
+        autosize=True if not width_px else False,
         margin=dict(l=250, r=40, t=60, b=60),
         separators=" ."
     )
@@ -677,7 +699,9 @@ def generate_stacked_bar_chart(df, stage_nodes, target_node, value_col, width_px
     fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         barmode='stack', plot_bgcolor="white", paper_bgcolor="white",
-        height=height_px, width=width_px, autosize=False, #final_autosize,
+        height=height_px,
+        width=width_px if width_px else None,
+        autosize=True if not width_px else False,
         margin=dict(l=60, r=40, t=60, b=120),
         xaxis=dict(title=dict(
                 text=' ➔ '.join([str(c).upper() for c in x_cols]),
@@ -802,8 +826,8 @@ def generate_bento_treemap(df, id_col, value_col, width_px, height_px, selected_
         plot_bgcolor="white",
         paper_bgcolor="white",
         height=height_px,
-        width=width_px,
-        autosize=False, #final_autosize,
+        width=width_px if width_px else None,
+        autosize=True if not width_px else False,
         margin=dict(l=20, r=20, t=60, b=20),
         separators="."
     )
@@ -909,8 +933,8 @@ def generate_heatmap(df, x_col, y_col, value_col, width_px, height_px, selected_
     fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         height=height_px,
-        width=width_px,
-        autosize=False, #final_autosize,
+    # width=width_px if width_px else None,
+    # autosize=True if not width_px else False,
         margin=dict(l=120, r=40, t=60, b=120),
         xaxis=dict(tickangle=0, type='category', scaleanchor="y", scaleratio=1),
         yaxis=dict(type='category'),
@@ -958,7 +982,7 @@ def generate_outliers_chart(df, stage_col, target_col, value_col,
         value_col_internal = value_col
 
     # Validate that the passed aggregation function is supported by pandas
-    if agg_func not in ["sum", "max", "mean"]:
+    if agg_func not in ["sum", "max", "mean", "min", "count"]:
         agg_func = "sum"
 
     # Directly assemble composite path sequences using a clean high-performance groupby pass
@@ -1020,6 +1044,10 @@ def generate_outliers_chart(df, stage_col, target_col, value_col,
         xaxis_label = f"MAX SINGLE-RUN VOLUME ({value_col.upper()})"
     elif agg_func == "mean":
         xaxis_label = f"AVERAGE VOLUME ({value_col.upper()})"
+    elif agg_func == "min":
+        xaxis_label = f"MIN SINGLE-RUN VOLUME ({value_col.upper()})"
+    elif agg_func == "count":
+        xaxis_label = f"NUMBER OF ({value_col.upper()})"
     else:
         xaxis_label = f"TOTAL ACCUMULATED VOLUME ({value_col.upper()})"
 
@@ -1027,7 +1055,8 @@ def generate_outliers_chart(df, stage_col, target_col, value_col,
     fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         plot_bgcolor="white", paper_bgcolor="white",
-        height=height_px, width=width_px, autosize=False,
+        height=height_px,     width=width_px if width_px else None,
+        autosize=True if not width_px else False,
         # UPDATED: Injected dynamic left margin calculation to prevent text truncation
         margin=dict(l=120, r=40, t=60, b=60),
         xaxis=dict(title=xaxis_label, # UPDATED: Using dynamic context label here
@@ -1878,7 +1907,7 @@ if uploaded_file is not None:
 
         with out_ctrl_col4:
             # NEW: Aggregation method dropdown for flexible analytical view scoping
-            agg_options_out = {"Total Accumulated (Sum)": "sum", "Max Single-Run (Max)": "max", "Average (Mean)": "mean"}
+            agg_options_out = {"Total Accumulated (Sum)": "sum", "Max Single-Run (Max)": "max", "Average (Mean)": "mean", "Min Single-Rin (Min)" : "min", "Total Number (Count)" : "count"}
             selected_agg_label_out = st.selectbox(
                 "Aggregation Method:",
                 options=list(agg_options_out.keys()),
