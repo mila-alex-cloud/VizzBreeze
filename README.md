@@ -1,14 +1,13 @@
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/vizzbreeze?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/vizzbreeze)
 
 # VizzBreeze
-
-[![GitHub stars](https://badgen.net)](https://github.com/mila-alex-cloud/VizzBreeze)
+[⭐ GitHub Repository](https://github.com/mila-alex-cloud/VizzBreeze)
 
 A lightweight, high-performance transactional web-dashboard designed for advanced data flow analytics, multi-stage routing visualization, and statistical risk audit, and AI Agent trace visualization. Built natively on top of Streamlit, Pandas, and Plotly.
 
 ---
 
-> If you find this project useful, please drop a ⭐ to support its development!
+If you find this project useful, please drop a ⭐ to support its development!
 
 
 ## Key Features
