@@ -2,7 +2,14 @@
 
 # VizzBreeze
 
-A lightweight, high-performance transactional web-dashboard designed for advanced data flow analytics, multi-stage routing visualization, and statistical risk audit，and AI Agent trace visualization. Built natively on top of Streamlit, Pandas, and Plotly.
+[![GitHub stars](https://badgen.net)](https://github.com/mila-alex-cloud/VizzBreeze)
+
+A lightweight, high-performance transactional web-dashboard designed for advanced data flow analytics, multi-stage routing visualization, and statistical risk audit, and AI Agent trace visualization. Built natively on top of Streamlit, Pandas, and Plotly.
+
+---
+
+> If you find this project useful, please drop a ⭐ to support its development!
+
 
 ## Key Features
 
@@ -13,7 +20,7 @@ A lightweight, high-performance transactional web-dashboard designed for advance
 - **AI Agent Trace & Observability**: Native templates designed to map LLM chain-of-thought routing, monitor token consumption footprints, and catch execution latency anomalies.
 
 
-## Build With
+## Built With
 1  - [Plotly](https://plotly.com) - Core interactive charting engine.
 2  - [Streamlit](https://streamlit.io) - Cloud infrastructure and web UI framework.
 3  - [Pandas](https://pydata.org) - High-performance data structures and data analysis engine.
