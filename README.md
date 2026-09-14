@@ -103,9 +103,8 @@ fig = vb.generate_funnel_chart(
     target_node='execution_status',                               
     value_col='tokens_used',                                      
     
-    # ИСПРАВЛЕНИЕ: Передаем параметры фильтрации из таблицы логов
     selected_route_dict={
-        'user_intent':'Tech Support', 'active_agent':'Router_Agent', 'tool_called':'Knowledge_Base_Lookup'  # Показываем путь только для конкретного ID лога
+        'user_intent':'Tech Support', 'active_agent':'Router_Agent', 'tool_called':'Knowledge_Base_Lookup'
 
     },                                       
     selected_palette=chosen_colors,            
