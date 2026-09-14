@@ -12,7 +12,7 @@ class StreamlitNoiseFilter:
         self.original_stream = original_stream
 
     def write(self, message):
-        # Жестко отсекаем строки, содержащие внутренний лог-мусор Streamlit
+
         if "missing ScriptRunContext" in message or "streamlit run" in message or "Session state does not function" in message:
             return
         if self.original_stream:
@@ -31,32 +31,6 @@ if sys.stderr:
 import streamlit as st
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
-
-def render_with_scroll(fig, width, height):
-    import streamlit as st
-    from streamlit.runtime.scriptrunner import get_script_run_ctx
-
-    # Calculate physical pixels from your centimeter scale
-    final_width = width if width is not None else 1800
-    fig.update_layout(width=final_width, height=height, autosize=False)
-
-    if get_script_run_ctx() is not None:
-        # ULTRA-DYNAMIC SCROLL WITH SIDEBAR COLLAPSE SUPPORT
-        st.markdown(f"""
-        <div style="overflow-x: auto; overflow-y: hidden; width: 100%; display: block; padding-bottom: 15px;">
-        <style>
-        .stPlotlyChart > div {{
-            /* Set the base fixed width calculated from your cm scale */
-            width: {final_width}px !important;      
-            min-width: {final_width}px !important;  
-            
-            /* CRITICAL FIX: If the calculated chart width is smaller than the 
-               actual screen content area (e.g., when the sidebar is collapsed), 
-               the chart will automatically and smoothly stretch to 100% of the browser window! */
-            max-width: 100% !important; 
-        }}
-        </style>
-        """, unsafe_allow_html=True)
 
 def render_with_scroll(fig, width, height):
     import streamlit as st
@@ -626,7 +600,7 @@ def generate_funnel_chart(df, stage_nodes, target_node, value_col, selected_rout
         plot_bgcolor="white",
         paper_bgcolor="white",
         height=height_px,
-        width=width_px if width_px else None, # Если None, то график будет растягиваться
+        width=width_px if width_px else None,
         autosize=True if not width_px else False,
         margin=dict(l=250, r=40, t=60, b=60),
         separators=" ."

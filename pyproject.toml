@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "vizzbreeze" # Unique package identifier registered on the PyPI index
-version = "1.0.19"
+version = "1.0.20"
 authors = [
     {name = "Mila Alex"}
 ]
@@ -35,5 +35,7 @@ vizzbreeze-run = "vizzbreeze.cli:main"
 packages = ["src/vizzbreeze"]
 
 [project.urls]
-"Homepage" = "https://github.com/mila-alex-cloud/VizzBreeze"
-"linkedin" = "https://www.linkedin.com/in/mila-alex-cfa" 
+Homepage = "https://github.com/mila-alex-cloud/VizzBreeze"
+Repository = "https://github.com/mila-alex-cloud/VizzBreeze.git"
+Documentation = "https://github.com/mila-alex-cloud/VizzBreeze/blob/main/README.md"
+Linkedin = "https://www.linkedin.com/in/mila-alex-cfa" 
