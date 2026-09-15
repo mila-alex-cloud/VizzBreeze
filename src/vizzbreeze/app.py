@@ -73,13 +73,27 @@ def render_with_scroll(fig, width, height):
         from IPython.display import display, HTML
         import plotly.io as pio
 
-        chart_html = pio.to_html(fig, include_plotlyjs='cdn', full_html=False)
+        # Generate a unique container ID using the object's memory address
+        container_id = f"vizzbreeze_container_{id(fig)}"
+
+        # Explicitly pass the div_id to to_html to force Plotly to use our unique identifier
+        chart_html = pio.to_html(fig, include_plotlyjs='cdn', full_html=False, div_id=container_id)
+        
+        # Inject CSS to override Plotly's internal responsiveness and enable scrolling
         scrollable_wrapper = f"""
-        <div style="width: 100%; overflow-x: auto; overflow-y: hidden; white-space: nowrap; border: 1px solid #e6e6e6; padding: 5px;">
+        <style>
+            #{container_id} .plotly-graph-div {{
+                width: {width}px !important;
+                height: {height}px !important;
+            }}
+        </style>
+        <div id="{container_id}" style="width: 100%; overflow-x: auto; overflow-y: auto; white-space: nowrap; border: 1px solid #e6e6e6; padding: 5px;">
             {chart_html}
         </div>
         """
+        # Directly render the wrapped HTML inside the notebook interface immediately
         display(HTML(scrollable_wrapper))
+        return None
 
 
 # Initialize the page configuration ONLY within an active Streamlit server session
