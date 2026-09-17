@@ -143,13 +143,8 @@ fig = vb.generate_stacked_bar_chart(
     title_x = 0.5
 )
 fig.update_layout(
-    margin=dict(l=100, r=20, t=50, b=120)
-)
-
-fig.update_layout(
-    yaxis=dict(
-        title=""
-    )
+    margin=dict(l=100, r=20, t=50, b=120),
+    yaxis=dict(title="")
 )
 
 fig.show()
