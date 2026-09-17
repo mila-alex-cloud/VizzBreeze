@@ -44,7 +44,7 @@ vizzbreeze-run
 If you explicitly need to run VizzBreeze in cloud environments like Google Colab, please use a secure SSH/Port-forwarding tunnel to bypass iframe infrastructure limits.
 
 ## Test Dataset
-To explore the dashboard features instantly, you can use the pre-configured spreadsheet **`sample_data_unaggregated.xlsx`** located in the root folder of this repository. Just drag and drop it into the sidebar upload zone!
+To explore the dashboard features instantly, you can use the pre-configured spreadsheet **`1. sample_(ai_traces).xlsx`** located in the root folder of this repository. Just drag and drop it into the sidebar upload zone!
 
 ### Accessing Built-in Color Palettes
 You don't need to hardcode HEX styles. Access the corporate design system directly from the package configuration:
