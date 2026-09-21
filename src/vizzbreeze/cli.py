@@ -30,7 +30,8 @@ def main():
             "-m",
             "streamlit",
             "run",
-            str(app_path)
+            str(app_path),
+            "--server.maxUploadSize", "2000"
         ], env=env, check=True) # Передаем наше кастомное окружение env
 
     except KeyboardInterrupt:
