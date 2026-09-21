@@ -143,20 +143,20 @@ st.markdown(r"""
 # GLOBAL SESSION STATE MATRIX & TYPOGRAPHY ANCHORS (PEP 8 COMPLIANT)
 # =============================================================================
 # Initialize global volumetric metrics, dashboard titles, and alignment layers
-if "global_measure_col" not in st.session_state:
-    st.session_state["global_measure_col"] = "Number of rows (Sample size)"
+if "vb_global_measure_col" not in st.session_state:
+    st.session_state["vb_global_measure_col"] = "Number of rows (Sample size)"
 
-if "global_color_col" not in st.session_state:
-    st.session_state["global_color_col"] = "Select Feature"
+if "vb_global_color_col" not in st.session_state:
+    st.session_state["vb_global_color_col"] = "Select Feature"
 
-if "global_chart_title" not in st.session_state:
-    st.session_state["global_chart_title"] = "Add Header"
+if "vb_global_chart_title" not in st.session_state:
+    st.session_state["vb_global_chart_title"] = "Add Header"
 
-if "global_title_size" not in st.session_state:
-    st.session_state["global_title_size"] = 20
+if "vb_global_title_size" not in st.session_state:
+    st.session_state["vb_global_title_size"] = 20
 
-if "global_title_align" not in st.session_state:
-    st.session_state["global_title_align"] = "Left"
+if "vb_global_title_align" not in st.session_state:
+    st.session_state["vb_global_title_align"] = "Left"
 
 
 def sync_global_session_variable(tab_key, state_target_key):
@@ -1195,30 +1195,30 @@ if uploaded_file is not None:
     chosen_colors = COLOR_PALETTES[selected_palette]
 
     # Stateful session memory layer management for asset maps cache flushing
-    if "previous_palette_name" not in st.session_state:
-        st.session_state["previous_palette_name"] = selected_palette
+    if "vb_previous_palette_name" not in st.session_state:
+        st.session_state["vb_previous_palette_name"] = selected_palette
 
-    if st.session_state["previous_palette_name"] != selected_palette:
-        st.session_state["previous_palette_name"] = selected_palette
-        if "color_map" in st.session_state:
-            del st.session_state.color_map
-        if "color_map_agg" in st.session_state:
-            del st.session_state.color_map_agg
-        st.session_state["shuffle_seed_modifier"] = 0
+    if st.session_state["vb_previous_palette_name"] != selected_palette:
+        st.session_state["vb_previous_palette_name"] = selected_palette
+        if "vb_color_map" in st.session_state:
+            del st.session_state["vb_color_map"]
+        if "vb_color_map_agg" in st.session_state:
+            del st.session_state["vb_color_map_agg"]
+        st.session_state["vb_shuffle_seed_modifier"] = 0
 
-    st.session_state["selected_palette"] = selected_palette
+    st.session_state["vb_selected_palette"] = selected_palette
 
     # Maintain stateful cryptographic tracking variables for stable permutations
-    if "current_seed" not in st.session_state:
-        st.session_state["current_seed"] = 42
+    if "vb_current_seed" not in st.session_state:
+        st.session_state["vb_current_seed"] = 42
 
     # Allocate a random seeding modifier upon execution to invalidate outdated tracking map configurations
     if st.sidebar.button("Shuffle Colors"):
-        st.session_state["current_seed"] = random.randint(0, 100000)
-        if "color_map" in st.session_state:
-            del st.session_state.color_map
-        if "color_map_agg" in st.session_state:
-            del st.session_state.color_map_agg
+        st.session_state["vb_current_seed"] = random.randint(0, 100000)
+        if "vb_color_map" in st.session_state:
+            del st.session_state["vb_color_map"]
+        if "vb_color_map_agg" in st.session_state:
+            del st.session_state["vb_color_map_agg"]
 
     st.sidebar.markdown("---")
 
@@ -1260,14 +1260,14 @@ if uploaded_file is not None:
         with title_col1:
             chart_title = st.text_input(
                 "Header:",
-                value=st.session_state["global_chart_title"],
+                value=st.session_state["vb_global_chart_title"],
                 key="local_title_text_parcats",
                 on_change=sync_global_session_variable,
-                args=("local_title_text_parcats", "global_chart_title")
+                args=("local_title_text_parcats", "vb_global_chart_title")
             )
         with title_col2:
             align_options = ["Left", "Center", "Right"]
-            current_align = st.session_state["global_title_align"]
+            current_align = st.session_state["vb_global_title_align"]
             default_align_idx = align_options.index(current_align) if current_align in align_options else 0
 
             parcats_title_align = st.selectbox(
@@ -1276,18 +1276,18 @@ if uploaded_file is not None:
                 index=default_align_idx,
                 key="local_title_align_parcats",
                 on_change=sync_global_session_variable,
-                args=("local_title_align_parcats", "global_title_align")
+                args=("local_title_align_parcats", "vb_global_title_align")
             )
         with title_col3:
             title_size = st.slider(
                 "Title Font Size:",
                 min_value=12,
                 max_value=32,
-                value=int(st.session_state["global_title_size"]),
+                value=int(st.session_state["vb_global_title_size"]),
                 step=1,
                 key="local_title_size_parcats",
                 on_change=sync_global_session_variable,
-                args=("local_title_size_parcats", "global_title_size")
+                args=("local_title_size_parcats", "vb_global_title_size")
             )
 
         # Control Panel Section 1: Axis Mapping and Pipeline Traversal Configuration
@@ -1311,7 +1311,7 @@ if uploaded_file is not None:
             )
         with p_ctrl3:
             parcats_metric_options = ["Number of rows (Sample size)"] + list(opt_table.select_dtypes(include=[np.number]).columns)
-            current_global_val = st.session_state["global_measure_col"]
+            current_global_val = st.session_state["vb_global_measure_col"]
             default_idx_par = parcats_metric_options.index(current_global_val) if current_global_val in parcats_metric_options else 0
 
             value_col_parcats = st.selectbox(
@@ -1320,14 +1320,14 @@ if uploaded_file is not None:
                 index=default_idx_par,
                 key="local_val_parcats",
                 on_change=sync_global_session_variable,
-                args=("local_val_parcats", "global_measure_col")
+                args=("local_val_parcats", "vb_global_measure_col")
             )
 
         # Geometry transformations for header placement and random seeds allocation
         align_mapping_s = {"Left": 0.0, "Center": 0.5, "Right": 1.0}
         title_x_pos_s = align_mapping_s.get(parcats_title_align, 0.0)
 
-        base_seed = st.session_state.get("current_seed", 42)
+        base_seed = st.session_state.get("vb_current_seed", 42)
         palette_indices = {name: i for i, name in enumerate(COLOR_PALETTES.keys())}
         use_shuffle = base_seed + (palette_indices.get(selected_palette, 0) * 100)
 
@@ -1373,7 +1373,7 @@ if uploaded_file is not None:
         with fun_title_col1:
             fun_chart_title = st.text_input(
                 "Header:",
-                value=st.session_state["global_chart_title"],
+                value=st.session_state["vb_global_chart_title"],
                 key="local_title_text_funnel",
                 on_change=sync_global_session_variable,
                 args=("local_title_text_funnel", "global_chart_title")
@@ -1382,7 +1382,7 @@ if uploaded_file is not None:
             )
         with fun_title_col2:
             align_options=["Left", "Center", "Right"]
-            current_align = st.session_state["global_title_align"]
+            current_align = st.session_state["vb_global_title_align"]
             default_align_idx = align_options.index(current_align) if current_align in align_options else 0
             fun_title_align = st.selectbox(
                 "Header Alignment:",
@@ -1390,7 +1390,7 @@ if uploaded_file is not None:
                 index=default_align_idx,
                 key="local_title_align_funnel",
                 on_change=sync_global_session_variable,
-                args=("local_title_align_funnel", "global_title_align")
+                args=("local_title_align_funnel", "vb_global_title_align")
             )
         with fun_title_col3:
             fun_title_size = st.slider(
@@ -1401,7 +1401,7 @@ if uploaded_file is not None:
                 step=1,
                 key="local_title_size_funnel",
                 on_change=sync_global_session_variable,
-                args=("local_title_size_funnel", "global_title_size")
+                args=("local_title_size_funnel", "vb_global_title_size")
             )
 
         # Control Panel Section 2: Component Axis Mapping Configuration (MULTISELECT ENHANCED)
@@ -1425,7 +1425,7 @@ if uploaded_file is not None:
             )
         with fun_ctrl_col3:
             funnel_metric_options = ["Number of rows (Sample size)"] + list(opt_table.select_dtypes(include=[np.number]).columns)
-            current_global_val = st.session_state["global_measure_col"]
+            current_global_val = st.session_state["vb_global_measure_col"]
             default_idx_fun = funnel_metric_options.index(current_global_val) if current_global_val in funnel_metric_options else 0
             value_col_fun = st.selectbox(
                 "Weight/Volume:",
@@ -1433,7 +1433,7 @@ if uploaded_file is not None:
                 index=default_idx_fun,
                 key="local_val_funnel",
                 on_change=sync_global_session_variable,
-                args=("local_val_parcats", "global_measure_col")
+                args=("local_val_parcats", "vb_global_measure_col")
             )
 
         st.markdown("Select Specific Route Path for Funnel Profiling:")
@@ -1481,13 +1481,13 @@ if uploaded_file is not None:
         title_x_pos_f = align_mapping_f.get(fun_title_align, 0.0)
 
         # Fetch stable randomization seed explicitly to safeguard pipeline operations
-        base_seed = st.session_state.get("current_seed", 42)
+        base_seed = st.session_state.get("vb_current_seed", 42)
         palette_indices = {name: i for i, name in enumerate(COLOR_PALETTES.keys())}
         use_shuffle = base_seed + (palette_indices.get(selected_palette, 0) * 100)
 
         # Generate a stable randomization seed for the visualization palette
         palette_indices = {name: i for i, name in enumerate(COLOR_PALETTES.keys())}
-        base_seed = st.session_state.get("current_seed", 42)
+        base_seed = st.session_state.get("vb_current_seed", 42)
         use_shuffle_fun = base_seed + (palette_indices.get(selected_palette, 0) * 100) + 100
 
         if check_is_aggregated_data(opt_table, selected_stages_fun, final_target_fun):
@@ -1529,15 +1529,15 @@ if uploaded_file is not None:
         with bar_title_col1:
             bar_chart_title = st.text_input(
                 "Header:",
-                value=st.session_state["global_chart_title"],
+                value=st.session_state["vb_global_chart_title"],
                 key="local_title_text_bar",
                 on_change=sync_global_session_variable,
-                args=("local_title_text_bar", "global_chart_title")
+                args=("local_title_text_bar", "vb_global_chart_title")
             )
 
         with bar_title_col2:
             align_options = ["Left", "Center", "Right"]
-            current_align = st.session_state["global_title_align"]
+            current_align = st.session_state["vb_global_title_align"]
             default_align_idx = align_options.index(current_align) if current_align in align_options else 0
 
             bar_title_align = st.selectbox(
@@ -1546,7 +1546,7 @@ if uploaded_file is not None:
                 index=default_align_idx,
                 key="local_title_align_bar",
                 on_change=sync_global_session_variable,
-                args=("local_title_align_bar", "global_title_align")
+                args=("local_title_align_bar", "vb_global_title_align")
             )
 
         with bar_title_col3:
@@ -1554,11 +1554,11 @@ if uploaded_file is not None:
                 "Title Font Size:",
                 min_value=12,
                 max_value=32,
-                value=int(st.session_state["global_title_size"]),
+                value=int(st.session_state["vb_global_title_size"]),
                 step=1,
                 key="local_title_size_bar",
                 on_change=sync_global_session_variable,
-                args=("local_title_size_bar", "global_title_size")
+                args=("local_title_size_bar", "vb_global_title_size")
             )
 
         # Control Panel Section 2: Axis Mapping and Pipeline Traversal Configuration
@@ -1571,7 +1571,7 @@ if uploaded_file is not None:
                 key="bar_stages_multi"
             )
         with bar_ctrl_col2:
-            current_global_col = st.session_state.get("global_color_col")
+            current_global_col = st.session_state.get("vb_global_color_col")
             # 2. Generate the list of available columns
             remaining_for_bar_target = [c for c in all_columns if c not in selected_stages_bar]
             if not remaining_for_bar_target:
@@ -1591,12 +1591,12 @@ if uploaded_file is not None:
                 index=default_index,
                 key="local_color_col",
                 on_change=sync_global_session_variable,
-                args=("local_color_col", "global_color_col")
+                args=("local_color_col", "vb_global_color_col")
             )
 
         with bar_ctrl_col3:
             bar_metric_options = ["Number of rows (Sample size)"] + list(opt_table.select_dtypes(include=[np.number]).columns)
-            current_global_val = st.session_state["global_measure_col"]
+            current_global_val = st.session_state["vb_global_measure_col"]
             default_idx_bar = funnel_metric_options.index(current_global_val) if current_global_val in bar_metric_options else 0
 
             value_col_bar = st.selectbox(
@@ -1605,7 +1605,7 @@ if uploaded_file is not None:
                 index=default_idx_bar,
                 key="local_val_bar",
                 on_change=sync_global_session_variable,
-                args=("local_val_bar", "global_measure_col")
+                args=("local_val_bar", "vb_global_measure_col")
             )
 
         st.markdown("---")
@@ -1616,7 +1616,7 @@ if uploaded_file is not None:
 
         # Generate a stable randomization seed for the visualization palette
         palette_indices = {name: i for i, name in enumerate(COLOR_PALETTES.keys())}
-        base_seed = st.session_state.get("current_seed", 42)
+        base_seed = st.session_state.get("vb_current_seed", 42)
         use_shuffle_bar = base_seed + (palette_indices.get(selected_palette, 0) * 100) + 200
 
         if check_is_aggregated_data(opt_table, selected_stages_bar, final_target_bar):
@@ -1660,14 +1660,14 @@ if uploaded_file is not None:
         with bento_title_col1:
             bento_chart_title = st.text_input(
                 "Header:",
-                value=st.session_state["global_chart_title"],
+                value=st.session_state["vb_global_chart_title"],
                 key="local_title_text_bento",
                 on_change=sync_global_session_variable,
-                args=("local_title_text_bento", "global_chart_title")
+                args=("local_title_text_bento", "vb_global_chart_title")
             )
         with bento_title_col2:
             align_options = ["Left", "Center", "Right"]
-            current_align = st.session_state["global_title_align"]
+            current_align = st.session_state["vb_global_title_align"]
             default_align_idx = align_options.index(current_align) if current_align in align_options else 0
 
             bento_title_align = st.selectbox(
@@ -1676,25 +1676,25 @@ if uploaded_file is not None:
                 index=default_align_idx,
                 key="local_title_align_bento",
                 on_change=sync_global_session_variable,
-                args=("local_title_align_bento", "global_title_align")
+                args=("local_title_align_bento", "vb_global_title_align")
             )
         with bento_title_col3:
             bento_title_size = st.slider(
                 "Title Font Size:",
                 min_value=12,
                 max_value=36,
-                value=int(st.session_state["global_title_size"]),
+                value=int(st.session_state["vb_global_title_size"]),
                 step=1,
                 key="local_title_size_bento",
                 on_change=sync_global_session_variable,
-                args=("local_title_size_bento", "global_title_size")
+                args=("local_title_size_bento", "vb_global_title_size")
             )
 
         # Control Panel Section 2: Axis Mapping and Dimension Grouping Configuration
         bento_ctrl_col1, bento_ctrl_col2 = st.columns(2)
         with bento_ctrl_col2:
             bento_metric_options = ["Number of rows (Sample size)"] + list(opt_table.select_dtypes(include=[np.number]).columns)
-            current_global_val = st.session_state["global_measure_col"]
+            current_global_val = st.session_state["vb_global_measure_col"]
             default_idx_bento = bento_metric_options.index(current_global_val) if current_global_val in bento_metric_options else 0
             value_col_bento = st.selectbox(
                 "Weight/Volume",
@@ -1702,7 +1702,7 @@ if uploaded_file is not None:
                 index=default_idx_bento,
                 key="local_val_bento",
                 on_change=sync_global_session_variable,
-                args=("local_val_bento", "global_measure_col")
+                args=("local_val_bento", "vb_global_measure_col")
             )
 
         with bento_ctrl_col1:
@@ -1720,7 +1720,7 @@ if uploaded_file is not None:
         title_x_pos = align_mapping.get(bento_title_align, 0.0)
 
         palette_indices = {name: i for i, name in enumerate(COLOR_PALETTES.keys())}
-        base_seed = st.session_state.get("current_seed", 42)
+        base_seed = st.session_state.get("vb_current_seed", 42)
         use_shuffle_bento = base_seed + (palette_indices.get(selected_palette, 0) * 100) + 300
 
 
@@ -1760,14 +1760,14 @@ if uploaded_file is not None:
         with h_title_col1:
             heatmap_chart_title = st.text_input(
                 "Header:",
-                value=st.session_state["global_chart_title"],
+                value=st.session_state["vb_global_chart_title"],
                 key="local_title_text_heatmap",
                 on_change=sync_global_session_variable,
-                args=("local_title_text_heatmap", "global_chart_title")
+                args=("local_title_text_heatmap", "vb_global_chart_title")
             )
         with h_title_col2:
             align_options = ["Left", "Center", "Right"]
-            current_align = st.session_state["global_title_align"]
+            current_align = st.session_state["vb_global_title_align"]
             default_align_idx = align_options.index(current_align) if current_align in align_options else 0
 
             heatmap_title_align = st.selectbox(
@@ -1776,18 +1776,18 @@ if uploaded_file is not None:
                 index=default_align_idx,
                 key="local_title_align_heatmap",
                 on_change=sync_global_session_variable,
-                args=("local_title_align_heatmap", "global_title_align")
+                args=("local_title_align_heatmap", "vb_global_title_align")
             )
         with h_title_col3:
             heatmap_title_size = st.slider(
                 "Title Font Size:",
                 min_value=12,
                 max_value=36,
-                value=int(st.session_state["global_title_size"]),
+                value=int(st.session_state["vb_global_title_size"]),
                 step=1,
                 key="local_title_size_heatmap",
                 on_change=sync_global_session_variable,
-                args=("local_title_size_heatmap", "global_title_size")
+                args=("local_title_size_heatmap", "vb_global_title_size")
             )
 
         # Control Panel Section 2: Axis Mapping and Heatmap Configuration
@@ -1809,7 +1809,7 @@ if uploaded_file is not None:
             )
         with h_ctrl3:
             heat_metric_options = ["Number of rows (Sample size)"] + list(opt_table.select_dtypes(include=[np.number]).columns)
-            current_global_val = st.session_state["global_measure_col"]
+            current_global_val = st.session_state["vb_global_measure_col"]
             default_idx_heat = heat_metric_options.index(current_global_val) if current_global_val in heat_metric_options else 0
             value_col_heatmap = st.selectbox(
                 "Volume Measure (Z-Axis Value):",
@@ -1817,7 +1817,7 @@ if uploaded_file is not None:
                 index=default_idx_heat,
                 key="local_val_heat",
                 on_change=sync_global_session_variable,
-                args=("local_val_heat", "global_measure_col")
+                args=("local_val_heat", "vb_global_measure_col")
             )
 
         with mat_ctrl_col4:
@@ -1844,7 +1844,7 @@ if uploaded_file is not None:
         title_x_pos_h = align_mapping.get(heatmap_title_align, 0.0)
 
         palette_indices = {name: i for i, name in enumerate(COLOR_PALETTES.keys())}
-        base_seed = st.session_state.get("current_seed", 42)
+        base_seed = st.session_state.get("vb_current_seed", 42)
         use_shuffle_heat = base_seed + (palette_indices.get(selected_palette, 0) * 100) + 400
 
         # Initialize the automated heatmap aggregation engine
@@ -1885,15 +1885,15 @@ if uploaded_file is not None:
         with out_title_col1:
             outliers_chart_title = st.text_input(
                 "Header:",
-                value=st.session_state["global_chart_title"],
+                value=st.session_state["vb_global_chart_title"],
                 key="local_title_text_outlier",
                 on_change=sync_global_session_variable,
-                args=("local_title_text_outlier", "global_chart_title")
+                args=("local_title_text_outlier", "vb_global_chart_title")
             )
 
         with out_title_col2:
             align_options = ["Left", "Center", "Right"]
-            current_align = st.session_state["global_title_align"]
+            current_align = st.session_state["vb_global_title_align"]
             default_align_idx = align_options.index(current_align) if current_align in align_options else 0
 
             outliers_title_align = st.selectbox(
@@ -1902,18 +1902,18 @@ if uploaded_file is not None:
                 index=default_align_idx,
                 key="outliers_title_align",
                 on_change=sync_global_session_variable,
-                args=("outliers_title_align", "global_title_align")
+                args=("outliers_title_align", "vb_global_title_align")
             )
         with out_title_col3:
             outliers_title_size = st.slider(
                 "Title Font Size:",
                 min_value=12,
                 max_value=36,
-                value=int(st.session_state["global_title_size"]),
+                value=int(st.session_state["vb_global_title_size"]),
                 step=1,
                 key="local_title_size_outlier",
                 on_change=sync_global_session_variable,
-                args=("local_title_size_outlier", "global_title_size")
+                args=("local_title_size_outlier", "vb_global_title_size")
             )
 
 
@@ -1940,7 +1940,7 @@ if uploaded_file is not None:
 
         with out_ctrl_col3:
             # TIGHT SYNCHRONIZATION FILTER: Bind the weight selector to global session state memory
-            current_global_val = st.session_state["global_measure_col"]
+            current_global_val = st.session_state["vb_global_measure_col"]
             default_idx_out = numeric_cols.index(current_global_val) if current_global_val in numeric_cols else 0
 
             value_col_out = st.selectbox(
@@ -1949,7 +1949,7 @@ if uploaded_file is not None:
                 index=default_idx_out,          # Preserves the user choice globally across tabs
                 key="local_val_outliers",       # Unique state tracking key for this selector element
                 on_change=sync_global_session_variable,
-                args=("local_val_outliers", "global_measure_col")    # FIXED: Bound to global_measure_col instead of alignment
+                args=("local_val_outliers", "vb_global_measure_col")    # FIXED: Bound to global_measure_col instead of alignment
             )
 
         with out_ctrl_col4:
@@ -1971,7 +1971,7 @@ if uploaded_file is not None:
         title_x_pos_out = align_mapping_out.get(outliers_title_align, 0.0)
 
         palette_indices = {name: i for i, name in enumerate(COLOR_PALETTES.keys())}
-        base_seed = st.session_state.get("current_seed", 42)
+        base_seed = st.session_state.get("vb_current_seed", 42)
         # Seed offset unified standard for the 7th tab view (+ 700)
         use_shuffle_out = base_seed + (palette_indices.get(selected_palette, 0) * 100) + 700
 
