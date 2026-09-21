@@ -87,7 +87,7 @@ def render_with_scroll(fig, width, height):
                 height: {height}px !important;
             }}
         </style>
-        <div id="{container_id}" style="width: 100%; overflow-x: auto; overflow-y: auto; white-space: nowrap; border: 1px solid #e6e6e6; padding: 5px;">
+        <div id="{container_id}" style="width: 100%; max-height: 450px; overflow-x: auto; overflow-y: auto; white-space: nowrap; border: 1px solid #e6e6e6; padding: 5px;">
             {chart_html}
         </div>
         """
