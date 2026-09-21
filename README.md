@@ -8,8 +8,6 @@ A lightweight, high-performance transactional web-dashboard designed for advance
 
 If you find this project useful, please drop a ⭐ to support its development!
 
-<video src="demo.mp4" autoplay loop muted playsinline width="100%"></video>
-
 ---
 ## Key Features
 
