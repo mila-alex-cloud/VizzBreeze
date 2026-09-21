@@ -855,7 +855,7 @@ def generate_bento_treemap(df, id_col, value_col, width_px, height_px, selected_
     color_sequence = [get_blended_brand_color(i, working_colors) for i in range(len(labels))]
 
     # Render high-fidelity tiled architecture with clean pre-formatted text maps
-    fig_bento = go.Figure(go.Treemap(
+    fig = go.Figure(go.Treemap(
         labels=labels,
         parents=parents,
         values=values,
@@ -868,7 +868,7 @@ def generate_bento_treemap(df, id_col, value_col, width_px, height_px, selected_
 
 
     # Apply corporate reporting layout architecture using the British dot standard
-    fig_bento.update_layout(
+    fig.update_layout(
         title=dict(text=chart_title, font=dict(size=title_size), x=title_x, xanchor='auto'),
         plot_bgcolor="white",
         paper_bgcolor="white",
@@ -878,7 +878,7 @@ def generate_bento_treemap(df, id_col, value_col, width_px, height_px, selected_
         margin=dict(l=20, r=20, t=60, b=20),
         separators="."
     )
-    return fig_bento
+    return fig
 
 
 def generate_heatmap(df, x_col, y_col, value_col, width_px, height_px, selected_palette=None, unit_divider=1.0, force_shuffle=False,
