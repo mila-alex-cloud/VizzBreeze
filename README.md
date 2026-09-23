@@ -32,6 +32,7 @@ VizzBreeze functions process un-aggregated raw DataFrames and return native Plot
 import vizzbreeze as vb
 import pandas as pd
 ```
+To explore the dashboard features instantly, you can use the pre-configured spreadsheet **`1. sample_(ai_traces).xlsx`** located in the root folder of this repository. 
 
 ### JupiterLab/ VS Code Layout Tip
 If you are rendering massive multi-agent chains with a large width (e.g., `width_px=1300`) and notice that the chart gets clipped at the screen boundary without horizontal scrollbars, simply run this native cell macro in your notebook right before displaying the chart to force responsive layout scrolling:
@@ -55,7 +56,6 @@ vizzbreeze-run
 
 *(Note: If you explicitly need to run VizzBreeze in cloud environments like Google Colab, please use a secure SSH/Port-forwarding tunnel to bypass iframe infrastructure limits).*
 
-## Test Dataset
 To explore the dashboard features instantly, you can use the pre-configured spreadsheet **`1. sample_(ai_traces).xlsx`** located in the root folder of this repository. Just drag and drop it into the sidebar upload zone!
 
 ### Accessing Built-in Color Palettes
