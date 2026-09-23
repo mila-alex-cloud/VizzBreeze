@@ -33,7 +33,7 @@ import pandas as pd
 ```
 To explore the dashboard features instantly, you can use the pre-configured spreadsheet **`1. sample_(ai_traces).xlsx`** located in the root folder of this repository. 
 
-### JupyterLab/ VS Code Layout Tip
+#### JupyterLab/ VS Code Layout Tip
 If you are rendering massive multi-agent chains with a large width (e.g., `width_px=1300`) and notice that the chart gets clipped at the screen boundary without horizontal scrollbars, simply run this native cell macro in your notebook right before displaying the chart to force responsive layout scrolling:
 
 ```python
