@@ -11,9 +11,8 @@ If you find this project useful, please drop a ⭐ to support its development!
 ---
 ## Key Features
 
-- **Flat Transaction Processing Engine**: Optimized for fast processing of un-aggregated logs (e.g., Client ➔ Fund ➔ Asset).
+- **Flat Transaction Processing Engine**: Optimized for fast processing of un-aggregated logs.
 - **Global Session Synchronization**: Seamlessly locks metric column selections, typography sizes, and alignments across all workspace views.
-- **Auto-Scroll Suppression**: Enhanced layout architecture prevents viewport jumps during widget updates and data updates.
 - **Advanced Graph Matrix Analytics**: Includes high-fidelity stacked charts, multi-dimensional Parcats layouts, Density Matrices, and automated IQR risk audit profiling tools.
 - **AI Agent Trace & Observability**: Native templates designed to map LLM chain-of-thought routing, monitor token consumption footprints, and catch execution latency anomalies.
 
@@ -34,7 +33,7 @@ import pandas as pd
 ```
 To explore the dashboard features instantly, you can use the pre-configured spreadsheet **`1. sample_(ai_traces).xlsx`** located in the root folder of this repository. 
 
-### JupiterLab/ VS Code Layout Tip
+### JupyterLab/ VS Code Layout Tip
 If you are rendering massive multi-agent chains with a large width (e.g., `width_px=1300`) and notice that the chart gets clipped at the screen boundary without horizontal scrollbars, simply run this native cell macro in your notebook right before displaying the chart to force responsive layout scrolling:
 
 ```python
