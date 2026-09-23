@@ -2,8 +2,6 @@
 
 A lightweight, high-performance transactional web-dashboard designed for advanced data flow analytics, multi-stage routing visualization, and statistical risk audit, and AI Agent trace visualization. Built natively on top of Streamlit, Pandas, and Plotly.
 
-https://github.com/user-attachments/assets/397020cd-1893-4b88-a918-6461be9d6a42
-
 ### Try It Out
 * **Interactive Demo:** [Streamlit stateless site](https://vizzbreeze.streamlit.app)
 * **Source Code:** [GitHub Repository](https://github.com/mila-alex-cloud/VizzBreeze)
