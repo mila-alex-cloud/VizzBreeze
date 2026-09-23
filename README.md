@@ -25,7 +25,7 @@ If you find this project useful, please drop a ⭐ to support its development!
 
 ## Quick Start
 
-#### 1. Standard Python / Jupyter Notebook Usage
+#### 1. Standard Python / Jupyter & Google Colab Usage
 VizzBreeze functions process un-aggregated raw DataFrames and return native Plotly figures, making them fully compatible with Jupyter views and pipeline automation:
 
 ```python
@@ -33,8 +33,9 @@ import vizzbreeze as vb
 import pandas as pd
 ```
 
-### Jupiter/ VS Code Layout Tip
+### JupiterLab/ VS Code Layout Tip
 If you are rendering massive multi-agent chains with a large width (e.g., `width_px=1300`) and notice that the chart gets clipped at the screen boundary without horizontal scrollbars, simply run this native cell macro in your notebook right before displaying the chart to force responsive layout scrolling:
+
 ```python
 %%html
 <style>
