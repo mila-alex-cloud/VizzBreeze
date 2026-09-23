@@ -32,6 +32,8 @@ import streamlit as st
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 
+
+
 def render_with_scroll(fig, width, height):
     import streamlit as st
     from streamlit.runtime.scriptrunner import get_script_run_ctx
@@ -73,25 +75,50 @@ def render_with_scroll(fig, width, height):
         from IPython.display import display, HTML
         import plotly.io as pio
 
-        # Generate a unique container ID using the object's memory address
-        container_id = f"vizzbreeze_container_{id(fig)}"
+        # Generate a unique ID specifically for the Plotly chart div
+        plotly_div_id = f"vizzbreeze_plotly_{id(fig)}"
+        # Generate a unique ID for the outer scrollable wrapper container
+        wrapper_id = f"vizzbreeze_wrap_{id(fig)}"
 
-        # Explicitly pass the div_id to to_html to force Plotly to use our unique identifier
-        chart_html = pio.to_html(fig, include_plotlyjs='cdn', full_html=False, div_id=container_id)
-        
-        # Inject CSS to override Plotly's internal responsiveness and enable scrolling
+        # Generate raw HTML for the chart using the fixed Plotly div ID
+        chart_html = pio.to_html(fig, include_plotlyjs='cdn', full_html=False, div_id=plotly_div_id)
+
+        # Assemble the scrollable wrapper with CSS overrides
         scrollable_wrapper = f"""
         <style>
-            #{container_id} .plotly-graph-div {{
+            /* Allow notebook output cells to display scrollbars natively */
+            .jp-OutputArea-output, .output_subarea {{
+                overflow: visible !important;
+            }}
+
+            /* Styles for the outer scrollable container */
+            #{wrapper_id} {{
+                display: block !important;
+                width: 100% !important;
+                max-width: 95vw !important;
+                max-height: 450px !important;
+                overflow-x: auto !important;
+                overflow-y: auto !important;
+                border: 1px solid #e6e6e6;
+                padding: 10px;
+                box-sizing: border-box;
+            }}
+
+            /* Force Plotly to maintain fixed dimensions and trigger scrollbars */
+            #{plotly_div_id} .plotly-graph-div {{
                 width: {width}px !important;
                 height: {height}px !important;
+                min-width: {width}px !important;
+                min-height: {height}px !important;
             }}
         </style>
-        <div id="{container_id}" style="width: 100%; max-height: 450px; overflow-x: auto; overflow-y: auto; white-space: nowrap; border: 1px solid #e6e6e6; padding: 5px;">
+
+        <div id="{wrapper_id}">
             {chart_html}
         </div>
         """
-        # Directly render the wrapped HTML inside the notebook interface immediately
+
+        # Render the wrapped HTML directly inside the notebook interface
         display(HTML(scrollable_wrapper))
         return None
 

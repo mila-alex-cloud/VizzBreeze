@@ -2,6 +2,10 @@
 
 A lightweight, high-performance transactional web-dashboard designed for advanced data flow analytics, multi-stage routing visualization, and statistical risk audit, and AI Agent trace visualization. Built natively on top of Streamlit, Pandas, and Plotly.
 
+<p align="center">
+  <video src="./demo.mp4" width="100%" controls autoplay loop muted></video>
+</p>
+
 ### Try It Out
 * **Interactive Demo:** [Streamlit stateless site](https://vizzbreeze.streamlit.app)
 * **Source Code:** [GitHub Repository](https://github.com/mila-alex-cloud/VizzBreeze)
@@ -32,6 +36,16 @@ VizzBreeze functions process un-aggregated raw DataFrames and return native Plot
 import vizzbreeze as vb
 import pandas as pd
 ```
+
+### Jupiter/ VS Code Layout Tip
+If you are rendering massive multi-agent chains with a large width (e.g., `width_px=1300`) and notice that the chart gets clipped at the screen boundary without horizontal scrollbars, simply run this native cell macro in your notebook right before displaying the chart to force responsive layout scrolling:
+%%html
+<style>
+.jp-OutputArea-output, .output_subarea {
+    overflow-x: auto !important;
+}
+</style>
+*(Note: In cloud environments like Google Colab, horizontal scrolling works natively out-of-the-box without any tweaks).*
 
 #### 2. Standalone Web Control Room Execution
 If you prefer a full-scale interactive UI with global layout sync, just open your local terminal and run:
