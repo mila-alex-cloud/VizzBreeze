@@ -16,6 +16,14 @@ If you find this project useful, please drop a ⭐ to support its development!
 - **Advanced Graph Matrix Analytics**: Includes high-fidelity stacked charts, multi-dimensional Parcats layouts, Density Matrices, and automated IQR risk audit profiling tools.
 - **AI Agent Trace & Observability**: Native templates designed to map LLM chain-of-thought routing, monitor token consumption footprints, and catch execution latency anomalies.
 
+## Supported Data Formats
+VizzBreeze is engine-agnostic and designed to fit natively into standard AI development, LLM engineering, and data science workflows. It accepts un-aggregated raw logs in three major formats:
+
+- **JSON / JSONL (Recommended for LLM Ops)**: Direct export pipelines from frameworks like LangChain, CrewAI, AutoGen, or custom OpenAI/Anthropic API telemetry wrappers.
+- **CSV**: High-performance, lightweight flat tabular traces optimized for rapid Pandas processing and memory efficiency.
+- **Excel (.xlsx / .xls)**: Native spreadsheet ingestion for transactional business analysis, enterprise risk audits, and manual log reviews.
+
+*(Note: Data Ingestion Tip: Regardless of the source format, the internal Streamlit ingestion engine normalizes all uploads into an optimized pandas.DataFrame configuration to guarantee backward compatibility with all graph matrices).*
 
 ## Built With
 1  - [Plotly](https://plotly.com) - Core interactive charting engine.
