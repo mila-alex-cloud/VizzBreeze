@@ -19,12 +19,12 @@ def main():
         sys.exit(1)
 
     try:
-        # Создаем копию текущего окружения системы
+        # Create a copy of the current system environment variables
         env = os.environ.copy()
-        # Незаметно для sys.argv передаем настройку размера файлов через окружение
+        # Set the max upload size via environment variables away from sys.argv
         env["STREAMLIT_SERVER_MAX_UPLOAD_SIZE"] = "2000"
 
-        # Запускаем чистый чистый streamlit run БЕЗ аргументов (как это было раньше!)
+        # Launch clean streamlit run WITHOUT extra arguments (just like before!)
         subprocess.run([
             sys.executable,
             "-m",
@@ -32,7 +32,7 @@ def main():
             "run",
             str(app_path),
             "--server.maxUploadSize", "2000"
-        ], env=env, check=True) # Передаем наше кастомное окружение env
+        ], env=env, check=True) # Pass our custom env mapping
 
     except KeyboardInterrupt:
         print("\nDashboard execution terminated by user.")
