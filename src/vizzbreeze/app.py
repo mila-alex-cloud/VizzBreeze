@@ -1160,14 +1160,26 @@ def generate_outliers_chart(df, stage_col, target_col, value_col,
 # INGESTION & PIPELINE RUNTIME LOGIC (DASHBOARD CONTROL WORKSPACE)
 # =============================================================================
 
-uploaded_file = st.file_uploader("Upload Excel File",
-                                 type=["xlsx"],
-                                 label_visibility="collapsed")
+uploaded_file = st.file_uploader("Upload Agent Logs (Excel, CSV, or JSON)",
+                                type=["xlsx", "csv", "json"],
+                                label_visibility="collapsed"
+                                )
 
 if uploaded_file is not None:
-    opt_table = pd.read_excel(uploaded_file)
+    file_name = uploaded_file.name.lower()
 
-    # Initialize a reactive checkbox layout element to preview transactional logs
+    try:
+        if file_name.endswith('.xlsx') or file_name.endswith('.xls'):
+            opt_table = pd.read_excel(uploaded_file)
+        elif file_name.endswith('.csv'):
+            opt_table = pd.read_csv(uploaded_file)
+        elif file_name.endswith('.json'):
+            opt_table = pd.read_json(uploaded_file)
+    
+    except Exception as e:
+        st.error(f"Error reading file: {e}. Please ensure the file matches the selected format.")
+        st.stop()
+    
     show_raw_data = st.checkbox("View Uploaded Data Table", key="checkbox_raw_data")
     all_columns = list(opt_table.columns)
 
